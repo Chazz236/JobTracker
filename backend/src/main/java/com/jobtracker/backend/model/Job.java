@@ -2,6 +2,8 @@ package com.jobtracker.backend.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -38,7 +40,7 @@ public class Job {
     @Column(name = "applied_date", nullable = false)
     private LocalDate appliedDate;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private String status;
-
+    private JobStatus status;
 }
