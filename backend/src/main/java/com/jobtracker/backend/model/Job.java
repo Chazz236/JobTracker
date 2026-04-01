@@ -16,6 +16,11 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
+
+/**
+ * Represents a job application entity stored in the database
+ * This model tracks the details of a job application
+ */
 @Entity
 @Table(name = "jobs")
 @Getter
