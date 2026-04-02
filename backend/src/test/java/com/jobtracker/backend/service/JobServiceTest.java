@@ -36,7 +36,6 @@ public class JobServiceTest {
     @BeforeEach
     void setUp() {
         job = Job.builder()
-                .id(1L)
                 .jobTitle("Junior Developer")
                 .company("123 Computers")
                 .location("Brampton, ON")
@@ -62,6 +61,18 @@ public class JobServiceTest {
                     .extracting(Job::getJobTitle)
                     .containsExactly("Junior Developer", "Junior Analyst");
         }
+
+        @Test
+        @DisplayName("Should return empty list when no jobs exist")
+        void shouldReturnEmptyList() {
+            when(jobRepository.findAll()).thenReturn(List.of());
+
+            List<Job> result = jobService.getAllJobs();
+
+            assertThat(result).isEmpty();
+
+            verify(jobRepository).findAll();
+        }
     }
 
     @Nested
@@ -70,13 +81,25 @@ public class JobServiceTest {
         @Test
         @DisplayName("Should create a job")
         void shouldCreateJob() {
-            when(jobRepository.save(any(Job.class))).thenReturn(job);
+            Job testJob = Job.builder()
+                    .id(1L)
+                    .jobTitle("Junior Developer")
+                    .company("123 Computers")
+                    .location("Brampton, ON")
+                    .appliedDate(LocalDate.of(2026,4,1))
+                    .status(JobStatus.APPLIED)
+                    .build();
 
-            Job createdJob = jobService.createJob(new Job());
+            when(jobRepository.save(any(Job.class))).thenReturn(testJob);
+
+            Job createdJob = jobService.createJob(job);
 
             assertThat(createdJob).isNotNull();
+            assertThat(createdJob.getId()).isNotNull();
             assertThat(createdJob.getJobTitle()).isEqualTo("Junior Developer");
             assertThat(createdJob.getStatus()).isEqualTo(JobStatus.APPLIED);
+
+            verify(jobRepository).save(job);
         }
     }
 
