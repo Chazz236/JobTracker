@@ -1,5 +1,6 @@
 package com.jobtracker.backend.service;
 
+import com.jobtracker.backend.exception.ResourceNotFoundException;
 import com.jobtracker.backend.model.Job;
 import com.jobtracker.backend.repository.JobRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,9 @@ public class JobService {
     }
 
     public void deleteJob(Long id) {
+        if (!jobRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Job with id=" + id + " not found");
+        }
         jobRepository.deleteById(id);
     }
 }

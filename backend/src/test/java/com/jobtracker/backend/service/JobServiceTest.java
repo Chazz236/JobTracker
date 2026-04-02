@@ -1,5 +1,6 @@
 package com.jobtracker.backend.service;
 
+import com.jobtracker.backend.exception.ResourceNotFoundException;
 import com.jobtracker.backend.model.Job;
 import com.jobtracker.backend.model.JobStatus;
 import com.jobtracker.backend.repository.JobRepository;
@@ -16,7 +17,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -83,9 +86,25 @@ public class JobServiceTest {
         @Test
         @DisplayName("Should delete a job by id")
         void shouldDeleteJob() {
+            when(jobRepository.existsById(1L)).thenReturn(true);
+
             jobService.deleteJob(1L);
 
             verify(jobRepository).deleteById(1L);
+        }
+
+        @Test
+        @DisplayName("Should throw exception when deleting job that doesn't exist")
+        void shouldThrowExceptionWhenIdNotFound() {
+            Long id = 100L;
+
+            when(jobRepository.existsById(id)).thenReturn(false);
+
+            assertThatThrownBy(() -> jobService.deleteJob(id))
+                    .isInstanceOf(ResourceNotFoundException.class)
+                    .hasMessageContaining("Job with id=" + id + " not found");
+
+            verify(jobRepository, never()).deleteById(id);
         }
     }
 }
