@@ -31,4 +31,17 @@ public class JobService {
         }
         jobRepository.deleteById(id);
     }
+
+    public Job updateJob(Long id, Job updatedJob) {
+        return jobRepository.findById(id)
+                .map(job -> {
+                    job.setJobTitle(updatedJob.getJobTitle());
+                    job.setCompany(updatedJob.getCompany());
+                    job.setLocation(updatedJob.getLocation());
+                    job.setAppliedDate(updatedJob.getAppliedDate());
+                    job.setStatus(updatedJob.getStatus());
+                    return jobRepository.save(job);
+                })
+                .orElseThrow(() -> new ResourceNotFoundException("Job with id=" + id + " not found"));
+    }
 }

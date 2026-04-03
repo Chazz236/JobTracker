@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -39,7 +40,7 @@ public class JobServiceTest {
                 .jobTitle("Junior Developer")
                 .company("123 Computers")
                 .location("Brampton, ON")
-                .appliedDate(LocalDate.of(2026,4,1))
+                .appliedDate(LocalDate.of(2026, 4, 1))
                 .status(JobStatus.APPLIED)
                 .build();
     }
@@ -86,7 +87,7 @@ public class JobServiceTest {
                     .jobTitle("Junior Developer")
                     .company("123 Computers")
                     .location("Brampton, ON")
-                    .appliedDate(LocalDate.of(2026,4,1))
+                    .appliedDate(LocalDate.of(2026, 4, 1))
                     .status(JobStatus.APPLIED)
                     .build();
 
@@ -109,11 +110,13 @@ public class JobServiceTest {
         @Test
         @DisplayName("Should delete a job by id")
         void shouldDeleteJob() {
-            when(jobRepository.existsById(1L)).thenReturn(true);
+            Long id = 1L;
 
-            jobService.deleteJob(1L);
+            when(jobRepository.existsById(id)).thenReturn(true);
 
-            verify(jobRepository).deleteById(1L);
+            jobService.deleteJob(id);
+
+            verify(jobRepository).deleteById(id);
         }
 
         @Test
@@ -128,6 +131,52 @@ public class JobServiceTest {
                     .hasMessageContaining("Job with id=" + id + " not found");
 
             verify(jobRepository, never()).deleteById(id);
+        }
+    }
+
+    @Nested
+    @DisplayName("Update Job")
+    class UpdateJobTests {
+        @Test
+        @DisplayName("Should update a job by id")
+        void shouldUpdateJob() {
+            Long id = 1L;
+
+            job.setId(id);
+
+            Job updatedJob = Job.builder()
+                    .jobTitle("Senior Developer")
+                    .company("123 Computers")
+                    .location("Brampton, ON")
+                    .appliedDate(LocalDate.of(2026, 4, 2))
+                    .status(JobStatus.INTERVIEWING)
+                    .build();
+
+            when(jobRepository.findById(id)).thenReturn(Optional.of(job));
+            when(jobRepository.save(any(Job.class))).thenAnswer(i -> i.getArgument(0));
+
+            Job result = jobService.updateJob(id, updatedJob);
+
+            assertThat(result).isNotNull();
+            assertThat(result.getId()).isNotNull();
+            assertThat(result.getJobTitle()).isEqualTo("Senior Developer");
+            assertThat(result.getStatus()).isEqualTo(JobStatus.INTERVIEWING);
+
+            verify(jobRepository).save(job);
+        }
+
+        @Test
+        @DisplayName("Should throw exception when updating job that doesn't exist")
+        void shouldThrowExceptionWhenIdNotFound() {
+            Long id = 100L;
+
+            when(jobRepository.findById(id)).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> jobService.updateJob(id, job))
+                    .isInstanceOf(ResourceNotFoundException.class)
+                    .hasMessageContaining("Job with id=" + id + " not found");
+
+            verify(jobRepository, never()).save(any());
         }
     }
 }
