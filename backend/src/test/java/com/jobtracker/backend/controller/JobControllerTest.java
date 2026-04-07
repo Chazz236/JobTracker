@@ -19,9 +19,11 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -132,6 +134,35 @@ public class JobControllerTest {
                     .andExpect(status().isBadRequest());
 
             verify(jobService, never()).createJob(any());
+        }
+    }
+
+    @Nested
+    @DisplayName("Delete Jobs API")
+    class DeleteJobAPITests {
+        @Test
+        @DisplayName("DELETE /api/jobs/{id} - Should delete a job")
+        void shouldDeleteJob() throws Exception {
+            Long id = 1L;
+
+            mockmvc.perform(delete("/api/jobs/{id}", id))
+                    .andExpect(status().isNoContent());
+
+            verify(jobService).deleteJob(id);
+        }
+
+        @Test
+        @DisplayName("DELETE /api/jobs/{id} - Should return 500 when service fails")
+        void shouldReturn500OnServiceError() throws Exception {
+            Long id = 1L;
+
+            doThrow(new JobServiceException("Unexpected error occurred"))
+                    .when(jobService).deleteJob(id);
+
+            mockmvc.perform(delete("/api/jobs/{id}", id))
+                    .andExpect(status().isInternalServerError());
+
+            verify(jobService).deleteJob(id);
         }
     }
 }
