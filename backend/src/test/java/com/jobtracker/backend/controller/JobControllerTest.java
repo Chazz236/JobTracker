@@ -1,6 +1,7 @@
 package com.jobtracker.backend.controller;
 
 import com.jobtracker.backend.exception.JobServiceException;
+import com.jobtracker.backend.exception.ResourceNotFoundException;
 import com.jobtracker.backend.model.Job;
 import com.jobtracker.backend.model.JobStatus;
 import com.jobtracker.backend.service.JobService;
@@ -17,8 +18,12 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -26,6 +31,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -163,6 +169,50 @@ public class JobControllerTest {
                     .andExpect(status().isInternalServerError());
 
             verify(jobService).deleteJob(id);
+        }
+    }
+
+    @Nested
+    @DisplayName("Update Jobs API")
+    class UpdateJobAPITests {
+        @Test
+        @DisplayName("PUT /api/jobs/{id} - Should update a job")
+        void shouldUpdateJob() throws Exception {
+            Long id = 1L;
+
+            Job updatedJob = Job.builder()
+                    .jobTitle("Senior Developer")
+                    .company("123 Computers")
+                    .location("Brampton, ON")
+                    .appliedDate(LocalDate.of(2026, 4, 2))
+                    .status(JobStatus.INTERVIEWING)
+                    .build();
+
+            when(jobService.updateJob(any(Long.class), any(Job.class))).thenReturn(updatedJob);
+
+            mockmvc.perform(put("/api/jobs/{id}", id)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(updatedJob)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.jobTitle").value("Senior Developer"));
+
+            verify(jobService).updateJob(eq(id), any(Job.class));
+        }
+
+        @Test
+        @DisplayName("PUT /api/jobs/{id} - Should return error status when job not found")
+        void shouldReturnErrorWhenJobNotFound() throws Exception {
+            Long id = 100L;
+
+            when(jobService.updateJob(eq(id), any(Job.class)))
+                    .thenThrow(new ResourceNotFoundException("Job with id=" + id + " not found"));
+
+            mockmvc.perform(put("/api/jobs/{id}", id)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(job)))
+                    .andExpect(status().isNotFound());
+
+            verify(jobService).updateJob(eq(id), any(Job.class));
         }
     }
 }
