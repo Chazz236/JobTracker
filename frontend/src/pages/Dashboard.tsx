@@ -28,11 +28,15 @@ const Dashboard = () => {
         setJobs((prevJobs) => [...prevJobs, jobWithId]);
     };
 
+    const onDelete = (id: number) => {
+        setJobs((prevJobs) => prevJobs.filter(job => job.id !== id));
+    };
+
     return (
         <main>
             <h1>Job Applications</h1>
             <JobForm onAdd={onAdd}/>
-            <JobTable jobs={jobs} />
+            <JobTable jobs={jobs} onDelete={onDelete} />
         </main>
     );
 };
