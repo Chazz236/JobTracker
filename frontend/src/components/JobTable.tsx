@@ -26,7 +26,7 @@ const JobTable = ({ jobs, onDelete }: JobTableProps) => {
                         <td>{job.location}</td>
                         <td>{job.appliedDate}</td>
                         <td>{job.status}</td>
-                        <td><button onClick={() => job.id && onDelete(job.id)}></button></td>
+                        <td><button onClick={() => job.id && onDelete(job.id)}>Delete</button></td>
                     </tr>
                 ))}
             </tbody>
