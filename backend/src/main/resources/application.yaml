@@ -5,9 +5,9 @@ spring:
   application:
     name: backend
   datasource:
-    url: jdbc:postgresql://localhost:5432/jobtracker
-    username: jobtracker
-    password: jobtracker_hush
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/jobtracker}
+    username: ${SPRING_DATASOURCE_USERNAME:jobtracker}
+    password: ${SPRING_DATASOURCE_PASSWORD:jobtracker_hush}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
