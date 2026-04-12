@@ -23,9 +23,17 @@ const Dashboard = () => {
         }
     ]);
 
+    const [edit, setEdit] = useState<Job | null>(null);
+
     const onAdd = (job: Job) => {
-        const jobWithId = {...job, id: jobs.length > 0 ? Math.max(...jobs.map(j => j.id || 0)) + 1 : 1};
-        setJobs((prevJobs) => [...prevJobs, jobWithId]);
+        if (edit) {
+            setJobs(jobs.map(j => j.id === edit.id ? { ...job, id: edit.id } : j));
+            setEdit(null);
+        }
+        else {
+            const jobWithId = { ...job, id: jobs.length > 0 ? Math.max(...jobs.map(j => j.id || 0)) + 1 : 1 };
+            setJobs((prevJobs) => [...prevJobs, jobWithId]);
+        }
     };
 
     const onDelete = (id: number) => {
@@ -35,8 +43,8 @@ const Dashboard = () => {
     return (
         <main>
             <h1>Job Applications</h1>
-            <JobForm onAdd={onAdd}/>
-            <JobTable jobs={jobs} onDelete={onDelete} />
+            <JobForm onAdd={onAdd} edit={edit} onCancel={() => setEdit(null)} />
+            <JobTable jobs={jobs} onDelete={onDelete} onEdit={(job) => setEdit(job)} />
         </main>
     );
 };

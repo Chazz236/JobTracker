@@ -1,41 +1,47 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Job } from "../types";
 
 interface JobFormProps {
     onAdd: (job: Job) => void;
+    edit: Job | null;
+    onCancel: () => void;
 }
 
-const JobForm = ({ onAdd }: JobFormProps) => {
+const JobForm = ({ onAdd, edit, onCancel }: JobFormProps) => {
     const getTodayString = () => new Date().toISOString().split('T')[0];
 
-    const [jobData, setJobData] = useState<Job>({
+    const resetJob: Job = {
         jobTitle: '',
         company: '',
         location: '',
         appliedDate: getTodayString(),
         status: 'APPLIED'
-    });
+    };
+
+    const [jobData, setJobData] = useState<Job>(resetJob);
 
     const onSubmit = (e: React.SubmitEvent) => {
         e.preventDefault();
         onAdd(jobData);
-        setJobData({
-            jobTitle: '',
-            company: '',
-            location: '',
-            appliedDate: getTodayString(),
-            status: 'APPLIED'
-        });
+        setJobData(resetJob);
     }
 
     const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setJobData({...jobData, [e.target.id]: e.target.value});
     }
 
+    useEffect(() => {
+        if (edit) {
+            setJobData(edit);
+        }
+        else {
+            setJobData(resetJob);
+        }
+    }, [edit]);
 
     return (
         <section>
-            <h2>Add Job</h2>
+            <h2>{edit ? 'Edit Job' : 'Add Job'}</h2>
             <form onSubmit={onSubmit}>
                 <label htmlFor='jobTitle'>Job Title</label>
                 <input id='jobTitle' type='text' value={jobData.jobTitle} onChange={onChange} required />
@@ -54,8 +60,11 @@ const JobForm = ({ onAdd }: JobFormProps) => {
                     <option value='REJECTED'>Rejected</option>
                 </select>
                 <button type='submit'>
-                    Add Job
+                    {edit ? 'Edit Job' : 'Add Job'}
                 </button>
+                {edit && (
+                    <button type='button' onClick={onCancel}>Cancel</button>
+                )}
             </form>
         </section>
     );

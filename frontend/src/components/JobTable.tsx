@@ -3,9 +3,10 @@ import type { Job } from "../types";
 interface JobTableProps {
     jobs: Job[];
     onDelete: (id: number) => void;
+    onEdit: (job: Job) => void;
 }
 
-const JobTable = ({ jobs, onDelete }: JobTableProps) => {
+const JobTable = ({ jobs, onDelete, onEdit }: JobTableProps) => {
     return (
         <table>
             <thead>
@@ -26,7 +27,10 @@ const JobTable = ({ jobs, onDelete }: JobTableProps) => {
                         <td>{job.location}</td>
                         <td>{job.appliedDate}</td>
                         <td>{job.status}</td>
-                        <td><button onClick={() => job.id && onDelete(job.id)}>Delete</button></td>
+                        <td>
+                            <button onClick={() => onEdit(job)}>Edit</button>
+                            <button onClick={() => job.id && onDelete(job.id)}>Delete</button>
+                        </td>
                     </tr>
                 ))}
             </tbody>
