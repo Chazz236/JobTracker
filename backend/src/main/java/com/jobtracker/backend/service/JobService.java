@@ -1,8 +1,11 @@
 package com.jobtracker.backend.service;
 
+import com.jobtracker.backend.dto.JobRequestDTO;
+import com.jobtracker.backend.dto.JobResponseDTO;
 import com.jobtracker.backend.exception.ResourceNotFoundException;
 import com.jobtracker.backend.model.Job;
 import com.jobtracker.backend.repository.JobRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,14 +20,20 @@ import java.util.List;
 public class JobService {
     private final JobRepository jobRepository;
 
-    public List<Job> getAllJobs() {
-        return jobRepository.findAll();
+    public List<JobResponseDTO> getAllJobs() {
+        return jobRepository.findAll()
+                .stream()
+                .map(JobResponseDTO::fromEntity)
+                .toList();
     }
 
-    public Job createJob(Job job) {
-        return jobRepository.save(job);
+    @Transactional
+    public JobResponseDTO createJob(JobRequestDTO request) {
+        Job job = jobRepository.save(request.toEntity());
+        return JobResponseDTO.fromEntity(job);
     }
 
+    @Transactional
     public void deleteJob(Long id) {
         if (!jobRepository.existsById(id)) {
             throw new ResourceNotFoundException("Job with id=" + id + " not found");
@@ -32,15 +41,18 @@ public class JobService {
         jobRepository.deleteById(id);
     }
 
-    public Job updateJob(Long id, Job updatedJob) {
+    @Transactional
+    public JobResponseDTO updateJob(Long id, JobRequestDTO request) {
         return jobRepository.findById(id)
                 .map(job -> {
-                    job.setJobTitle(updatedJob.getJobTitle());
-                    job.setCompany(updatedJob.getCompany());
-                    job.setLocation(updatedJob.getLocation());
-                    job.setAppliedDate(updatedJob.getAppliedDate());
-                    job.setStatus(updatedJob.getStatus());
-                    return jobRepository.save(job);
+                    job.setJobTitle(request.jobTitle());
+                    job.setCompany(request.company());
+                    job.setLocation(request.location());
+                    job.setAppliedDate(request.appliedDate());
+                    job.setStatus(request.status());
+
+                    Job updatedJob = jobRepository.save(job);
+                    return JobResponseDTO.fromEntity(updatedJob);
                 })
                 .orElseThrow(() -> new ResourceNotFoundException("Job with id=" + id + " not found"));
     }

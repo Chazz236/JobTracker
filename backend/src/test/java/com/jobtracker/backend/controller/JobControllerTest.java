@@ -1,5 +1,7 @@
 package com.jobtracker.backend.controller;
 
+import com.jobtracker.backend.dto.JobRequestDTO;
+import com.jobtracker.backend.dto.JobResponseDTO;
 import com.jobtracker.backend.exception.JobServiceException;
 import com.jobtracker.backend.exception.ResourceNotFoundException;
 import com.jobtracker.backend.model.Job;
@@ -46,17 +48,27 @@ public class JobControllerTest {
     @MockitoBean
     private JobService jobService;
 
-    private Job job;
+    private JobResponseDTO response;
+    private JobRequestDTO request;
 
     @BeforeEach
     void setUp() {
-        job = Job.builder()
-                .jobTitle("Junior Developer")
-                .company("123 Computers")
-                .location("Brampton, ON")
-                .appliedDate(LocalDate.of(2026, 4, 1))
-                .status(JobStatus.APPLIED)
-                .build();
+        response = new JobResponseDTO(
+                1L,
+                "Junior Developer",
+                "123 Computers",
+                "Brampton, ON",
+                LocalDate.of(2026, 4, 1),
+                JobStatus.APPLIED
+        );
+
+        request = new JobRequestDTO(
+                "Junior Developer",
+                "123 Computers",
+                "Brampton, ON",
+                LocalDate.of(2026, 4, 1),
+                JobStatus.APPLIED
+        );
     }
 
     @Nested
@@ -65,12 +77,13 @@ public class JobControllerTest {
         @Test
         @DisplayName("GET /api/jobs - Should return all jobs")
         void shouldReturnJobs() throws Exception {
-            when(jobService.getAllJobs()).thenReturn(List.of(job));
+            when(jobService.getAllJobs()).thenReturn(List.of(response));
 
             mockmvc.perform(get("/api/jobs"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.size()").value(1))
-                    .andExpect(jsonPath("$[0].jobTitle").value("Junior Developer"));
+                    .andExpect(jsonPath("$[0].jobTitle").value("Junior Developer"))
+                    .andExpect(jsonPath("$[0].id").value(1));
         }
 
         @Test
@@ -99,25 +112,26 @@ public class JobControllerTest {
         @Test
         @DisplayName("POST /api/jobs - Should create a job")
         void shouldCreateJob() throws Exception {
-            when(jobService.createJob(any(Job.class))).thenReturn(job);
+            when(jobService.createJob(any(JobRequestDTO.class))).thenReturn(response);
 
             mockmvc.perform(post("/api/jobs")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(job)))
+                    .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isCreated())
-                    .andExpect(jsonPath("$.jobTitle").value("Junior Developer"));
+                    .andExpect(jsonPath("$.jobTitle").value("Junior Developer"))
+                    .andExpect(jsonPath("$.id").value(1));
 
-            verify(jobService).createJob(any(Job.class));
+            verify(jobService).createJob(any(JobRequestDTO.class));
         }
 
         @Test
         @DisplayName("POST /api/jobs - Should return 500 when service fails")
         void shouldReturn500OnServiceError() throws Exception {
-            when(jobService.createJob(any(Job.class))).thenThrow(new JobServiceException("Unexpected error occurred"));
+            when(jobService.createJob(any(JobRequestDTO.class))).thenThrow(new JobServiceException("Unexpected error occurred"));
 
             mockmvc.perform(post("/api/jobs")
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(job)))
+                            .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isInternalServerError());
 
             verify(jobService).createJob(any());
@@ -126,17 +140,17 @@ public class JobControllerTest {
         @Test
         @DisplayName("POST /api/jobs - Should return 400 when missing title")
         void shouldReturn400WhenTitleBlank() throws Exception {
-            Job invalidJob = Job.builder()
-                    .jobTitle("")
-                    .company("123 Computers")
-                    .location("Brampton, ON")
-                    .appliedDate(LocalDate.of(2026, 4, 1))
-                    .status(JobStatus.APPLIED)
-                    .build();
+            JobRequestDTO invalidRequest = new JobRequestDTO(
+                    "",
+                    "123 Computers",
+                    "Brampton, ON",
+                    LocalDate.of(2026, 4, 1),
+                    JobStatus.APPLIED
+            );
 
             mockmvc.perform(post("/api/jobs")
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(invalidJob)))
+                            .content(objectMapper.writeValueAsString(invalidRequest)))
                     .andExpect(status().isBadRequest());
 
             verify(jobService, never()).createJob(any());
@@ -180,23 +194,32 @@ public class JobControllerTest {
         void shouldUpdateJob() throws Exception {
             Long id = 1L;
 
-            Job updatedJob = Job.builder()
-                    .jobTitle("Senior Developer")
-                    .company("123 Computers")
-                    .location("Brampton, ON")
-                    .appliedDate(LocalDate.of(2026, 4, 2))
-                    .status(JobStatus.INTERVIEWING)
-                    .build();
+            JobRequestDTO updatedRequest = new JobRequestDTO(
+                    "Senior Developer",
+                    "123 Computers",
+                    "Toronto, ON",
+                    LocalDate.of(2026, 4, 2),
+                    JobStatus.INTERVIEWING
+            );
 
-            when(jobService.updateJob(any(Long.class), any(Job.class))).thenReturn(updatedJob);
+            JobResponseDTO updatedResponse = new JobResponseDTO(
+                    id,
+                    "Senior Developer",
+                    "123 Computers",
+                    "Toronto, ON",
+                    LocalDate.of(2026, 4, 2),
+                    JobStatus.INTERVIEWING
+            );
+
+            when(jobService.updateJob(eq(id), any(JobRequestDTO.class))).thenReturn(updatedResponse);
 
             mockmvc.perform(put("/api/jobs/{id}", id)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(updatedJob)))
+                            .content(objectMapper.writeValueAsString(updatedRequest)))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.jobTitle").value("Senior Developer"));
 
-            verify(jobService).updateJob(eq(id), any(Job.class));
+            verify(jobService).updateJob(eq(id), any(JobRequestDTO.class));
         }
 
         @Test
@@ -204,15 +227,23 @@ public class JobControllerTest {
         void shouldReturnErrorWhenJobNotFound() throws Exception {
             Long id = 100L;
 
-            when(jobService.updateJob(eq(id), any(Job.class)))
+            JobRequestDTO updatedRequest = new JobRequestDTO(
+                    "Senior Developer",
+                    "123 Computers",
+                    "Toronto, ON",
+                    LocalDate.of(2026, 4, 2),
+                    JobStatus.INTERVIEWING
+            );
+
+            when(jobService.updateJob(eq(id), any(JobRequestDTO.class)))
                     .thenThrow(new ResourceNotFoundException("Job with id=" + id + " not found"));
 
             mockmvc.perform(put("/api/jobs/{id}", id)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(job)))
+                            .content(objectMapper.writeValueAsString(updatedRequest)))
                     .andExpect(status().isNotFound());
 
-            verify(jobService).updateJob(eq(id), any(Job.class));
+            verify(jobService).updateJob(eq(id), any(JobRequestDTO.class));
         }
     }
 }

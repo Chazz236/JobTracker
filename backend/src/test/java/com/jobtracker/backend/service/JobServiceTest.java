@@ -1,5 +1,7 @@
 package com.jobtracker.backend.service;
 
+import com.jobtracker.backend.dto.JobRequestDTO;
+import com.jobtracker.backend.dto.JobResponseDTO;
 import com.jobtracker.backend.exception.ResourceNotFoundException;
 import com.jobtracker.backend.model.Job;
 import com.jobtracker.backend.model.JobStatus;
@@ -33,16 +35,26 @@ public class JobServiceTest {
     private JobService jobService;
 
     private Job job;
+    private JobRequestDTO request;
 
     @BeforeEach
     void setUp() {
         job = Job.builder()
+                .id(1L)
                 .jobTitle("Junior Developer")
                 .company("123 Computers")
                 .location("Brampton, ON")
                 .appliedDate(LocalDate.of(2026, 4, 1))
                 .status(JobStatus.APPLIED)
                 .build();
+
+        request = new JobRequestDTO(
+                "Junior Developer",
+                "123 Computers",
+                "Brampton, ON",
+                LocalDate.of(2026, 4, 1),
+                JobStatus.APPLIED
+        );
     }
 
     @Nested
@@ -55,12 +67,12 @@ public class JobServiceTest {
 
             when(jobRepository.findAll()).thenReturn(List.of(job, job2));
 
-            List<Job> result = jobService.getAllJobs();
+            List<JobResponseDTO> response = jobService.getAllJobs();
 
-            assertThat(result)
-                    .hasSize(2)
-                    .extracting(Job::getJobTitle)
-                    .containsExactly("Junior Developer", "Junior Analyst");
+            assertThat(response).hasSize(2);
+            assertThat(response.get(0).jobTitle()).isEqualTo("Junior Developer");
+            assertThat(response.get(1).jobTitle()).isEqualTo("Junior Analyst");
+
         }
 
         @Test
@@ -68,9 +80,9 @@ public class JobServiceTest {
         void shouldReturnEmptyList() {
             when(jobRepository.findAll()).thenReturn(List.of());
 
-            List<Job> result = jobService.getAllJobs();
+            List<JobResponseDTO> response = jobService.getAllJobs();
 
-            assertThat(result).isEmpty();
+            assertThat(response).isEmpty();
 
             verify(jobRepository).findAll();
         }
@@ -82,25 +94,16 @@ public class JobServiceTest {
         @Test
         @DisplayName("Should create a job")
         void shouldCreateJob() {
-            Job testJob = Job.builder()
-                    .id(1L)
-                    .jobTitle("Junior Developer")
-                    .company("123 Computers")
-                    .location("Brampton, ON")
-                    .appliedDate(LocalDate.of(2026, 4, 1))
-                    .status(JobStatus.APPLIED)
-                    .build();
+            when(jobRepository.save(any(Job.class))).thenReturn(job);
 
-            when(jobRepository.save(any(Job.class))).thenReturn(testJob);
+            JobResponseDTO response = jobService.createJob(request);
 
-            Job createdJob = jobService.createJob(job);
+            assertThat(response).isNotNull();
+            assertThat(response.id()).isEqualTo(1L);
+            assertThat(response.jobTitle()).isEqualTo("Junior Developer");
+            assertThat(response.status()).isEqualTo(JobStatus.APPLIED);
 
-            assertThat(createdJob).isNotNull();
-            assertThat(createdJob.getId()).isNotNull();
-            assertThat(createdJob.getJobTitle()).isEqualTo("Junior Developer");
-            assertThat(createdJob.getStatus()).isEqualTo(JobStatus.APPLIED);
-
-            verify(jobRepository).save(job);
+            verify(jobRepository).save(any(Job.class));
         }
     }
 
@@ -142,27 +145,23 @@ public class JobServiceTest {
         void shouldUpdateJob() {
             Long id = 1L;
 
-            job.setId(id);
-
-            Job updatedJob = Job.builder()
-                    .jobTitle("Senior Developer")
-                    .company("123 Computers")
-                    .location("Brampton, ON")
-                    .appliedDate(LocalDate.of(2026, 4, 2))
-                    .status(JobStatus.INTERVIEWING)
-                    .build();
-
             when(jobRepository.findById(id)).thenReturn(Optional.of(job));
             when(jobRepository.save(any(Job.class))).thenAnswer(i -> i.getArgument(0));
 
-            Job result = jobService.updateJob(id, updatedJob);
+            JobRequestDTO updateRequest = new JobRequestDTO(
+                    "Senior Developer",
+                    "123 Computers",
+                    "Toronto",
+                    LocalDate.of(2026, 4, 2),
+                    JobStatus.INTERVIEWING
+            );
 
-            assertThat(result).isNotNull();
-            assertThat(result.getId()).isNotNull();
-            assertThat(result.getJobTitle()).isEqualTo("Senior Developer");
-            assertThat(result.getStatus()).isEqualTo(JobStatus.INTERVIEWING);
+            JobResponseDTO response = jobService.updateJob(id, updateRequest);
 
-            verify(jobRepository).save(job);
+            assertThat(response).isNotNull();
+            assertThat(response.id()).isNotNull();
+            assertThat(response.jobTitle()).isEqualTo("Senior Developer");
+            assertThat(response.status()).isEqualTo(JobStatus.INTERVIEWING);
         }
 
         @Test
@@ -172,7 +171,7 @@ public class JobServiceTest {
 
             when(jobRepository.findById(id)).thenReturn(Optional.empty());
 
-            assertThatThrownBy(() -> jobService.updateJob(id, job))
+            assertThatThrownBy(() -> jobService.updateJob(id, request))
                     .isInstanceOf(ResourceNotFoundException.class)
                     .hasMessageContaining("Job with id=" + id + " not found");
 

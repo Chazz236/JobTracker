@@ -1,5 +1,7 @@
 package com.jobtracker.backend.controller;
 
+import com.jobtracker.backend.dto.JobRequestDTO;
+import com.jobtracker.backend.dto.JobResponseDTO;
 import com.jobtracker.backend.model.Job;
 import com.jobtracker.backend.service.JobService;
 import jakarta.validation.Valid;
@@ -30,13 +32,13 @@ public class JobController {
     private final JobService jobService;
 
     @GetMapping
-    public List<Job> getAllJobs() {
+    public List<JobResponseDTO> getAllJobs() {
         return jobService.getAllJobs();
     }
 
     @PostMapping
-    public ResponseEntity<Job> createJob(@Valid @RequestBody Job job) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(jobService.createJob(job));
+    public ResponseEntity<JobResponseDTO> createJob(@Valid @RequestBody JobRequestDTO request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(jobService.createJob(request));
     }
 
     @DeleteMapping("/{id}")
@@ -46,7 +48,7 @@ public class JobController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Job> updateJob(@PathVariable Long id, @Valid @RequestBody Job job) {
-        return ResponseEntity.ok(jobService.updateJob(id, job));
+    public ResponseEntity<JobResponseDTO> updateJob(@PathVariable Long id, @Valid @RequestBody JobRequestDTO request) {
+        return ResponseEntity.ok(jobService.updateJob(id, request));
     }
 }
