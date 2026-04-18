@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
-import type { Job } from "../types";
+import type { JobRequest, JobResponse } from "../types";
 
 interface JobFormProps {
-    onAdd: (job: Job) => void;
-    edit: Job | null;
+    onSave: (job: JobRequest) => void;
+    edit: JobResponse | null;
     onCancel: () => void;
 }
 
-const JobForm = ({ onAdd, edit, onCancel }: JobFormProps) => {
+const JobForm = ({ onSave, edit, onCancel }: JobFormProps) => {
     const getTodayString = () => new Date().toISOString().split('T')[0];
 
-    const resetJob: Job = {
+    const resetJob: JobRequest = {
         jobTitle: '',
         company: '',
         location: '',
@@ -18,11 +18,11 @@ const JobForm = ({ onAdd, edit, onCancel }: JobFormProps) => {
         status: 'APPLIED'
     };
 
-    const [jobData, setJobData] = useState<Job>(resetJob);
+    const [jobData, setJobData] = useState<JobRequest>(resetJob);
 
     const onSubmit = (e: React.SubmitEvent) => {
         e.preventDefault();
-        onAdd(jobData);
+        onSave(jobData);
         setJobData(resetJob);
     }
 
@@ -32,7 +32,8 @@ const JobForm = ({ onAdd, edit, onCancel }: JobFormProps) => {
 
     useEffect(() => {
         if (edit) {
-            setJobData(edit);
+            const { id, ...data } = edit;
+            setJobData(data);
         }
         else {
             setJobData(resetJob);
@@ -60,7 +61,7 @@ const JobForm = ({ onAdd, edit, onCancel }: JobFormProps) => {
                     <option value='REJECTED'>Rejected</option>
                 </select>
                 <button type='submit'>
-                    {edit ? 'Edit Job' : 'Add Job'}
+                    {edit ? 'Update Job' : 'Add Job'}
                 </button>
                 {edit && (
                     <button type='button' onClick={onCancel}>Cancel</button>
