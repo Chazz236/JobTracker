@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { JobRequest, JobResponse } from "../types";
+import { type JobRequest, type JobResponse, JobStatus } from "../types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,7 +18,7 @@ const JobForm = ({ onSave, edit }: JobFormProps) => {
         company: '',
         location: '',
         appliedDate: getTodayString(),
-        status: 'APPLIED'
+        status: JobStatus.APPLIED
     };
 
     const [jobData, setJobData] = useState<JobRequest>(resetJob);
@@ -68,11 +68,9 @@ const JobForm = ({ onSave, edit }: JobFormProps) => {
                     </SelectTrigger>
                     <SelectContent>
                         <SelectGroup>
-                            <SelectItem value='APPLIED'>Applied</SelectItem>
-                            <SelectItem value='INTERVIEWING'>Interviewing</SelectItem>
-                            <SelectItem value='OFFERED'>Offered</SelectItem>
-                            <SelectItem value='ACCEPTED'>Accepted</SelectItem>
-                            <SelectItem value='REJECTED'>Rejected</SelectItem>
+                            {Object.values(JobStatus).map((status) => (
+                                <SelectItem key={status} value={status}>{status}</SelectItem>
+                            ))}
                         </SelectGroup>
                     </SelectContent>
                 </Select>
@@ -85,3 +83,5 @@ const JobForm = ({ onSave, edit }: JobFormProps) => {
 };
 
 export default JobForm;
+
+//{status.charAt(0) + status.slice(1).toLowerCase()}

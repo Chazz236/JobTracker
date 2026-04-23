@@ -1,4 +1,4 @@
-import type { JobResponse } from "../types";
+import type { JobResponse } from "../types/jobs";
 
 interface JobTableProps {
     jobs: JobResponse[];
