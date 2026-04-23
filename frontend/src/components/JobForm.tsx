@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
 import type { JobRequest, JobResponse } from "../types";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectGroup, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface JobFormProps {
     onSave: (job: JobRequest) => void;
     edit: JobResponse | null;
-    onCancel: () => void;
 }
 
-const JobForm = ({ onSave, edit, onCancel }: JobFormProps) => {
+const JobForm = ({ onSave, edit }: JobFormProps) => {
     const getTodayString = () => new Date().toISOString().split('T')[0];
 
     const resetJob: JobRequest = {
@@ -23,11 +26,10 @@ const JobForm = ({ onSave, edit, onCancel }: JobFormProps) => {
     const onSubmit = (e: React.SubmitEvent) => {
         e.preventDefault();
         onSave(jobData);
-        setJobData(resetJob);
     }
 
     const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        setJobData({...jobData, [e.target.id]: e.target.value});
+        setJobData({ ...jobData, [e.target.id]: e.target.value });
     }
 
     useEffect(() => {
@@ -41,33 +43,44 @@ const JobForm = ({ onSave, edit, onCancel }: JobFormProps) => {
     }, [edit]);
 
     return (
-        <section>
-            <h2>{edit ? 'Edit Job' : 'Add Job'}</h2>
-            <form onSubmit={onSubmit}>
-                <label htmlFor='jobTitle'>Job Title</label>
-                <input id='jobTitle' type='text' value={jobData.jobTitle} onChange={onChange} required />
-                <label htmlFor='company'>Company</label>
-                <input id='company' type='text' value={jobData.company} onChange={onChange} required />
-                <label htmlFor='location'>Location</label>
-                <input id='location' type='text' value={jobData.location} onChange={onChange} required />
-                <label htmlFor='appliedDate'>Applied Date</label>
-                <input id='appliedDate' type='date' value={jobData.appliedDate} onChange={onChange} required />
-                <label htmlFor='status'>Application Status</label>
-                <select id='status' value={jobData.status} onChange={onChange} required>
-                    <option value='APPLIED'>Applied</option>
-                    <option value='INTERVIEWING'>Interviewing</option>
-                    <option value='OFFERED'>Offered</option>
-                    <option value='ACCEPTED'>Accepted</option>
-                    <option value='REJECTED'>Rejected</option>
-                </select>
-                <button type='submit'>
-                    {edit ? 'Update Job' : 'Add Job'}
-                </button>
-                {edit && (
-                    <button type='button' onClick={onCancel}>Cancel</button>
-                )}
-            </form>
-        </section>
+        <form onSubmit={onSubmit} className='space-y-4 py-4'>
+            <div className='grid gap-1.5'>
+                <Label htmlFor='jobTitle'>Job Title</Label>
+                <Input id='jobTitle' type='text' value={jobData.jobTitle} onChange={onChange} required />
+            </div>
+            <div className='grid gap-1.5'>
+                <Label htmlFor='company'>Company</Label>
+                <Input id='company' type='text' value={jobData.company} onChange={onChange} required />
+            </div>
+            <div className='grid gap-1.5'>
+                <Label htmlFor='location'>Location</Label>
+                <Input id='location' type='text' value={jobData.location} onChange={onChange} required />
+            </div>
+            <div className='grid gap-1.5'>
+                <Label htmlFor='appliedDate'>Applied Date</Label>
+                <Input id='appliedDate' type='date' value={jobData.appliedDate} onChange={onChange} required />
+            </div>
+            <div className='grid gap-1.5'>
+                <Label htmlFor='status'>Application Status</Label>
+                <Select value={jobData.status} onValueChange={(value) => setJobData({ ...jobData, status: value as JobRequest['status'] })}>
+                    <SelectTrigger id='status' className='w-full'>
+                        <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectGroup>
+                            <SelectItem value='APPLIED'>Applied</SelectItem>
+                            <SelectItem value='INTERVIEWING'>Interviewing</SelectItem>
+                            <SelectItem value='OFFERED'>Offered</SelectItem>
+                            <SelectItem value='ACCEPTED'>Accepted</SelectItem>
+                            <SelectItem value='REJECTED'>Rejected</SelectItem>
+                        </SelectGroup>
+                    </SelectContent>
+                </Select>
+            </div>
+            <Button type='submit' className='w-full mt-4'>
+                {edit ? 'Update Job' : 'Add Job'}
+            </Button>
+        </form>
     );
 };
 
