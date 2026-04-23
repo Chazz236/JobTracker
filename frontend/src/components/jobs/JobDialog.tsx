@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import JobForm from "./JobForm";
-import type { JobResponse, JobRequest } from "../types";
+import type { JobRequest, JobResponse } from "@/types";
 
 interface JobDialogProps {
     onSave: (job: JobRequest) => void;

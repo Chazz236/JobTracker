@@ -1,9 +1,9 @@
-import { AppSidebar } from "./components/AppSidebar";
+import { AppSidebar } from "./components/layout/AppSidebar";
 import Dashboard from "./pages/Dashboard";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { useState, useEffect } from "react";
-import JobDialog from "./components/JobDialog";
-import type { JobRequest, JobResponse } from "./types";
+import JobDialog from "./components/jobs/JobDialog";
+import type { JobRequest, JobResponse } from "@/types";
 import jobService from "./services/jobService";
 
 function App() {

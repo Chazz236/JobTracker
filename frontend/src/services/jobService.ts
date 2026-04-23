@@ -1,5 +1,5 @@
 import api from "./api";
-import type { JobRequest, JobResponse } from "../types";
+import type { JobRequest, JobResponse } from "@/types";
 
 const jobService = {
     async getAll(): Promise<JobResponse[]> {

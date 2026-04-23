@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { type JobRequest, type JobResponse, JobStatus } from "../types";
+import { type JobRequest, type JobResponse, JobStatus } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -62,14 +62,14 @@ const JobForm = ({ onSave, edit }: JobFormProps) => {
             </div>
             <div className='grid gap-1.5'>
                 <Label htmlFor='status'>Application Status</Label>
-                <Select value={jobData.status} onValueChange={(value) => setJobData({ ...jobData, status: value as JobRequest['status'] })}>
+                <Select key={jobData.status} value={jobData.status} onValueChange={(value) => setJobData({ ...jobData, status: value as JobStatus })}>
                     <SelectTrigger id='status' className='w-full'>
                         <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectGroup>
                             {Object.values(JobStatus).map((status) => (
-                                <SelectItem key={status} value={status}>{status}</SelectItem>
+                                <SelectItem key={status} value={status}>{status.charAt(0) + status.slice(1).toLowerCase()}</SelectItem>
                             ))}
                         </SelectGroup>
                     </SelectContent>
@@ -83,5 +83,3 @@ const JobForm = ({ onSave, edit }: JobFormProps) => {
 };
 
 export default JobForm;
-
-//{status.charAt(0) + status.slice(1).toLowerCase()}

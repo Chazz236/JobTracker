@@ -1,5 +1,5 @@
 import type { JobResponse } from "../types";
-import JobTable from "../components/JobTable";
+import JobTable from "@/components/jobs/JobTable";
 
 interface DashboardProps {
     jobs: JobResponse[];
