@@ -2,6 +2,7 @@ import { type ColumnDef, flexRender, getCoreRowModel, useReactTable, type Sortin
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { useState } from "react";
 import { Input } from "../ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
@@ -11,6 +12,7 @@ interface DataTableProps<TData, TValue> {
 function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = useState<SortingState>([])
     const [globalFilter, setGlobalFilter] = useState('');
+    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
     const table = useReactTable({
         data,
@@ -20,16 +22,31 @@ function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValu
         getSortedRowModel: getSortedRowModel(),
         onGlobalFilterChange: setGlobalFilter,
         getFilteredRowModel: getFilteredRowModel(),
+        onColumnFiltersChange: setColumnFilters,
         state: {
             sorting,
-            globalFilter
+            globalFilter,
+            columnFilters
         }
     });
 
     return (
         <div>
-            <div className='flex items-center py-4'>
+            <div className='flex items-center justify-between py-4 gap-2'>
                 <Input placeholder='Search jobs, companies, or locations...' value={globalFilter ?? ''} onChange={(e) => setGlobalFilter(e.target.value)} className='max-w-sm' />
+                <Select value={(table.getColumn('status')?.getFilterValue() as string) ?? 'all'} onValueChange={(value) => table.getColumn('status')?.setFilterValue(value === 'all' ? '' : value)}>
+                    <SelectTrigger>
+                        <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value='all'>All Statuses</SelectItem>
+                        <SelectItem value='APPLIED'>Applied</SelectItem>
+                        <SelectItem value='INTERVIEWING'>Interviewing</SelectItem>
+                        <SelectItem value='OFFERED'>Offered</SelectItem>
+                        <SelectItem value='ACCEPTED'>Accepted</SelectItem>
+                        <SelectItem value='REJECTED'>Rejected</SelectItem>
+                    </SelectContent>
+                </Select>
             </div>
             <div className='rounded-md border'>
                 <Table>
