@@ -1,6 +1,7 @@
-import { type ColumnDef, flexRender, getCoreRowModel, useReactTable, type SortingState, getSortedRowModel } from "@tanstack/react-table";
+import { type ColumnDef, flexRender, getCoreRowModel, useReactTable, type SortingState, getSortedRowModel, getFilteredRowModel, type ColumnFiltersState } from "@tanstack/react-table";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { useState } from "react";
+import { Input } from "../ui/input";
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
@@ -9,20 +10,28 @@ interface DataTableProps<TData, TValue> {
 
 function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = useState<SortingState>([])
+    const [globalFilter, setGlobalFilter] = useState('');
+
     const table = useReactTable({
         data,
         columns,
         getCoreRowModel: getCoreRowModel(),
         onSortingChange: setSorting,
         getSortedRowModel: getSortedRowModel(),
+        onGlobalFilterChange: setGlobalFilter,
+        getFilteredRowModel: getFilteredRowModel(),
         state: {
-            sorting
-        },
+            sorting,
+            globalFilter
+        }
     });
 
     return (
-        <div className='rounded-md border'>
-            <div>
+        <div>
+            <div className='flex items-center py-4'>
+                <Input placeholder='Search jobs, companies, or locations...' value={globalFilter ?? ''} onChange={(e) => setGlobalFilter(e.target.value)} className='max-w-sm' />
+            </div>
+            <div className='rounded-md border'>
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
