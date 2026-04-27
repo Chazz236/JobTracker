@@ -9,6 +9,8 @@ import {
   deleteJob,
 } from './services/jobService';
 import { Layout } from './components/layout/Layout';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import Analytics from './pages/Analytics';
 
 const App = () => {
   const [jobs, setJobs] = useState<JobResponse[]>([]);
@@ -65,17 +67,21 @@ const App = () => {
   };
 
   return (
-    <>
-      <Layout onAdd={onAdd} title="Dashboard">
-        <Dashboard jobs={jobs} onEdit={onEdit} onDelete={onDelete} />
-      </Layout>
+    <BrowserRouter>
+      <Routes>
+        <Route element={<Layout onAdd={onAdd} />}>
+          <Route path="/dashboard" element={<Dashboard jobs={jobs} onEdit={onEdit} onDelete={onDelete} />} />
+          <Route path="/analytics" element={<Analytics />} />
+        </Route>
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
       <JobDialog
         onSave={onSave}
         edit={edit}
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
       />
-    </>
+    </BrowserRouter>
   );
 };
 

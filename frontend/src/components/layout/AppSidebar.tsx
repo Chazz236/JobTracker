@@ -8,7 +8,8 @@ import {
   SidebarMenuButton,
   SidebarGroupContent,
 } from '@/components/ui/sidebar';
-import { LayoutDashboard, CirclePlus, Briefcase } from 'lucide-react';
+import { LayoutDashboard, CirclePlus, Briefcase, ChartColumnStacked } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   onAdd: () => void;
@@ -17,12 +18,19 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
 const nav = [
   {
     title: 'Dashboard',
-    url: '#dash',
+    url: '/dashboard',
     icon: LayoutDashboard,
+  },
+  {
+    title: 'Analytics',
+    url: '/analytics',
+    icon: ChartColumnStacked,
   },
 ];
 
 export const AppSidebar = ({ onAdd, ...props }: AppSidebarProps) => {
+  const location = useLocation();
+
   return (
     <Sidebar collapsible="icon" variant="inset" {...props}>
       <SidebarHeader>
@@ -32,10 +40,10 @@ export const AppSidebar = ({ onAdd, ...props }: AppSidebarProps) => {
               asChild
               className="data-[slot=sidebar-menu-button]:p-1.5!"
             >
-              <a href="#home">
+              <Link to="/dashboard">
                 <Briefcase className="size-5!" />
                 <span className="text-base font-semibold">Job Tracker</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -57,11 +65,11 @@ export const AppSidebar = ({ onAdd, ...props }: AppSidebarProps) => {
             <SidebarMenu className="mt-2">
               {nav.map((navItem) => (
                 <SidebarMenuItem key={navItem.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={navItem.url}>
+                  <SidebarMenuButton asChild isActive={location.pathname === navItem.url}>
+                    <Link to={navItem.url}>
                       {navItem.icon && <navItem.icon />}
                       <span>{navItem.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
