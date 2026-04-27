@@ -6,15 +6,15 @@ export const JobStatus = {
   REJECTED: 'REJECTED',
 } as const;
 
-export type JobStatus = typeof JobStatus[keyof typeof JobStatus];
+export type JobStatus = (typeof JobStatus)[keyof typeof JobStatus];
 
 export interface JobResponse {
-    id: number;
-    jobTitle: string;
-    company: string;
-    location: string;
-    appliedDate: string;
-    status: JobStatus;
+  id: number;
+  jobTitle: string;
+  company: string;
+  location: string;
+  appliedDate: string;
+  status: JobStatus;
 }
 
 export type JobRequest = Omit<JobResponse, 'id'>;
