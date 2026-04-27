@@ -15,7 +15,7 @@ const nav = [
 
 export function AppSidebar({ onAdd, ...props }: AppSidebarProps) {
     return (
-        <Sidebar collapsible='icon' {...props}>
+        <Sidebar collapsible='icon' variant='inset' {...props}>
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>

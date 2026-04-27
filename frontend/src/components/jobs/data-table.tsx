@@ -31,11 +31,19 @@ function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValu
     });
 
     return (
-        <div>
+        <div> {/*className='p-6'*/}
+            <div>
+                <div className='flex flex-col gap-1'>
+                    <h1 className='text-2xl font-bold tracking-tight'>Job Applications</h1>
+                    <p className='text-sm text-muted-foreground'>Manage and track your job search progress</p>
+                </div>
+            </div>
             <div className='flex items-center justify-between py-4 gap-2'>
-                <Input placeholder='Search jobs, companies, or locations...' value={globalFilter ?? ''} onChange={(e) => setGlobalFilter(e.target.value)} className='max-w-sm' />
+                <div className='relative w-full max-w-sm'>
+                    <Input placeholder='Search jobs, companies, or locations...' value={globalFilter ?? ''} onChange={(e) => setGlobalFilter(e.target.value)} />
+                </div>
                 <Select value={(table.getColumn('status')?.getFilterValue() as string) ?? 'all'} onValueChange={(value) => table.getColumn('status')?.setFilterValue(value === 'all' ? '' : value)}>
-                    <SelectTrigger>
+                    <SelectTrigger className='w-[180px] bg-background'>
                         <SelectValue />
                     </SelectTrigger>
                     <SelectContent>

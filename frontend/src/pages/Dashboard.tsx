@@ -9,9 +9,10 @@ interface DashboardProps {
 
 const Dashboard = ({ jobs, onEdit, onDelete }: DashboardProps) => {
     return (
-        <div>
-            <h1>Job Applications</h1>
-            <JobTable jobs={jobs} onDelete={onDelete} onEdit={onEdit} />
+        <div className='grid gap-4 md:gap-8'>
+            <div className='rounded-xl border bg-card text-card-foreground shadow-sm p-6'>
+                <JobTable jobs={jobs} onDelete={onDelete} onEdit={onEdit} />
+            </div>
         </div>
     );
 };

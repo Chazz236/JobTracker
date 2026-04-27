@@ -1,6 +1,6 @@
 import { AppSidebar } from "./components/layout/AppSidebar";
 import Dashboard from "./pages/Dashboard";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { useState, useEffect } from "react";
 import JobDialog from "./components/jobs/JobDialog";
 import type { JobRequest, JobResponse } from "@/types";
@@ -60,24 +60,24 @@ function App() {
     };
 
     return (
-        <SidebarProvider>
+        <SidebarProvider className='bg-muted/40'>
             <AppSidebar onAdd={onAdd} />
-            <main>
-                <header>
-                    <SidebarTrigger />
+            <SidebarInset className='bg-background'>
+                <header className='flex h-16 shrink-0 items-center gap-2 px-4 md:px-8 border-b border-border'>
+                    <SidebarTrigger className='-ml-1' />
+                    <div className='h-4 w-px bg-border mx-2' />
+                    <h2 className='text-sm font-semibold uppercase tracking-wider text-muted-foreground'>Dashboard</h2>
                 </header>
-
-                <div>
+                <div className='flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8'>
                     <Dashboard jobs={jobs} onEdit={onEdit} onDelete={onDelete} />
                 </div>
-
-                <JobDialog
-                    onSave={onSave}
-                    edit={edit}
-                    open={isDialogOpen}
-                    onOpenChange={setIsDialogOpen}
-                />
-            </main>
+            </SidebarInset>
+            <JobDialog
+                onSave={onSave}
+                edit={edit}
+                open={isDialogOpen}
+                onOpenChange={setIsDialogOpen}
+            />
         </SidebarProvider>
     );
 }
