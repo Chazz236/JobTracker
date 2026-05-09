@@ -1,6 +1,5 @@
 package com.jobtracker.backend.dto;
 
-import com.jobtracker.backend.model.Job;
 import com.jobtracker.backend.model.JobStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -15,7 +14,10 @@ public record JobRequestDTO(
 
         @Schema(description = "Name of company", example = "Google")
         @NotBlank(message = "Company is required")
-        String company,
+        String companyName,
+
+        @Schema(description = "Link to the company's career page", example = "https://google.com/careers")
+        String companyJobPageLink,
 
         @Schema(description = "Location of job", example = "Toronto, Canada")
         @NotBlank(message = "Location is required")
@@ -28,14 +30,4 @@ public record JobRequestDTO(
         @Schema(description = "Current stage of application", example = "APPLIED")
         @NotNull(message = "Status is required")
         JobStatus status
-) {
-    public Job toEntity() {
-        return Job.builder()
-                .jobTitle(this.jobTitle())
-                .company(this.company())
-                .location(this.location())
-                .appliedDate(this.appliedDate())
-                .status(this.status())
-                .build();
-    }
-}
+) { }

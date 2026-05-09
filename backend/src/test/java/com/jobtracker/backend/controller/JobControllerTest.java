@@ -4,7 +4,6 @@ import com.jobtracker.backend.dto.JobRequestDTO;
 import com.jobtracker.backend.dto.JobResponseDTO;
 import com.jobtracker.backend.exception.JobServiceException;
 import com.jobtracker.backend.exception.ResourceNotFoundException;
-import com.jobtracker.backend.model.Job;
 import com.jobtracker.backend.model.JobStatus;
 import com.jobtracker.backend.service.JobService;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,10 +19,7 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -57,6 +53,7 @@ public class JobControllerTest {
                 1L,
                 "Junior Developer",
                 "123 Computers",
+                "123computers.com",
                 "Brampton, ON",
                 LocalDate.of(2026, 4, 1),
                 JobStatus.APPLIED
@@ -65,6 +62,7 @@ public class JobControllerTest {
         request = new JobRequestDTO(
                 "Junior Developer",
                 "123 Computers",
+                "123computers.com",
                 "Brampton, ON",
                 LocalDate.of(2026, 4, 1),
                 JobStatus.APPLIED
@@ -73,7 +71,7 @@ public class JobControllerTest {
 
     @Nested
     @DisplayName("Get Jobs API")
-    class getJobAPITests {
+    class GetJobAPITests {
         @Test
         @DisplayName("GET /api/jobs - Should return all jobs")
         void shouldReturnJobs() throws Exception {
@@ -83,6 +81,7 @@ public class JobControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.size()").value(1))
                     .andExpect(jsonPath("$[0].jobTitle").value("Junior Developer"))
+                    .andExpect(jsonPath("$[0].companyName").value("123 Computers"))
                     .andExpect(jsonPath("$[0].id").value(1));
         }
 
@@ -119,6 +118,7 @@ public class JobControllerTest {
                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.jobTitle").value("Junior Developer"))
+                    .andExpect(jsonPath("$.companyName").value("123 Computers"))
                     .andExpect(jsonPath("$.id").value(1));
 
             verify(jobService).createJob(any(JobRequestDTO.class));
@@ -143,6 +143,7 @@ public class JobControllerTest {
             JobRequestDTO invalidRequest = new JobRequestDTO(
                     "",
                     "123 Computers",
+                    "123computers.com",
                     "Brampton, ON",
                     LocalDate.of(2026, 4, 1),
                     JobStatus.APPLIED
@@ -184,6 +185,20 @@ public class JobControllerTest {
 
             verify(jobService).deleteJob(id);
         }
+
+        @Test
+        @DisplayName("DELETE /api/jobs/{id} - Should return 404 when job not found")
+        void shouldReturn404WhenJobNotFound() throws Exception {
+            Long id = 100L;
+
+            doThrow(new ResourceNotFoundException("Job with id=" + id + " not found"))
+                    .when(jobService).deleteJob(id);
+
+            mockmvc.perform(delete("/api/jobs/{id}", id))
+                    .andExpect(status().isNotFound());
+
+            verify(jobService).deleteJob(id);
+        }
     }
 
     @Nested
@@ -197,6 +212,7 @@ public class JobControllerTest {
             JobRequestDTO updatedRequest = new JobRequestDTO(
                     "Senior Developer",
                     "123 Computers",
+                    "123computers.com",
                     "Toronto, ON",
                     LocalDate.of(2026, 4, 2),
                     JobStatus.INTERVIEWING
@@ -206,6 +222,7 @@ public class JobControllerTest {
                     id,
                     "Senior Developer",
                     "123 Computers",
+                    "123computers.com",
                     "Toronto, ON",
                     LocalDate.of(2026, 4, 2),
                     JobStatus.INTERVIEWING
@@ -217,7 +234,8 @@ public class JobControllerTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(updatedRequest)))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.jobTitle").value("Senior Developer"));
+                    .andExpect(jsonPath("$.jobTitle").value("Senior Developer"))
+                    .andExpect(jsonPath("$.companyName").value("123 Computers"));
 
             verify(jobService).updateJob(eq(id), any(JobRequestDTO.class));
         }
@@ -230,6 +248,7 @@ public class JobControllerTest {
             JobRequestDTO updatedRequest = new JobRequestDTO(
                     "Senior Developer",
                     "123 Computers",
+                    "123computers.com",
                     "Toronto, ON",
                     LocalDate.of(2026, 4, 2),
                     JobStatus.INTERVIEWING

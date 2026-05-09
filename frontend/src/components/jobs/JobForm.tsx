@@ -22,7 +22,8 @@ export const JobForm = ({ onSave, edit }: JobFormProps) => {
 
   const resetJob: JobRequest = {
     jobTitle: '',
-    company: '',
+    companyName: '',
+    companyJobPageLink: '',
     location: '',
     appliedDate: getTodayString(),
     status: JobStatus.APPLIED,
@@ -44,7 +45,7 @@ export const JobForm = ({ onSave, edit }: JobFormProps) => {
   useEffect(() => {
     if (edit) {
       const { id, ...data } = edit;
-      setJobData(data);
+      setJobData({ ...data, companyJobPageLink: data.companyJobPageLink || '' });
     } else {
       setJobData(resetJob);
     }
@@ -63,13 +64,22 @@ export const JobForm = ({ onSave, edit }: JobFormProps) => {
         />
       </div>
       <div className="grid gap-1.5">
-        <Label htmlFor="company">Company</Label>
+        <Label htmlFor="companyName">Company Name</Label>
         <Input
-          id="company"
+          id="companyName"
           type="text"
-          value={jobData.company}
+          value={jobData.companyName}
           onChange={onChange}
           required
+        />
+      </div>
+      <div className="grid gap-1.5">
+        <Label htmlFor="companyJobPageLink">Company Job Page Link (Optional)</Label>
+        <Input
+          id="companyJobPageLink"
+          type="text"
+          value={jobData.companyJobPageLink}
+          onChange={onChange}
         />
       </div>
       <div className="grid gap-1.5">

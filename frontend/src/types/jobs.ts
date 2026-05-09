@@ -11,7 +11,8 @@ export type JobStatus = (typeof JobStatus)[keyof typeof JobStatus];
 export interface JobResponse {
   id: number;
   jobTitle: string;
-  company: string;
+  companyName: string;
+  companyJobPageLink?: string;
   location: string;
   appliedDate: string;
   status: JobStatus;

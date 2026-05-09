@@ -3,10 +3,13 @@ package com.jobtracker.backend.service;
 import com.jobtracker.backend.dto.JobRequestDTO;
 import com.jobtracker.backend.dto.JobResponseDTO;
 import com.jobtracker.backend.exception.ResourceNotFoundException;
+import com.jobtracker.backend.model.Company;
 import com.jobtracker.backend.model.Job;
+import com.jobtracker.backend.repository.CompanyRepository;
 import com.jobtracker.backend.repository.JobRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,9 +22,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JobService {
     private final JobRepository jobRepository;
+    private final CompanyRepository companyRepository;
 
     public List<JobResponseDTO> getAllJobs() {
-        return jobRepository.findAll()
+        return jobRepository.findAllWithCompany(Sort.by(Sort.Direction.DESC, "id"))
                 .stream()
                 .map(JobResponseDTO::fromEntity)
                 .toList();
@@ -29,8 +33,15 @@ public class JobService {
 
     @Transactional
     public JobResponseDTO createJob(JobRequestDTO request) {
-        Job job = jobRepository.save(request.toEntity());
-        return JobResponseDTO.fromEntity(job);
+        Company company = findOrAddCompany(request.companyName(), request.companyJobPageLink());
+        Job job = Job.builder()
+                .jobTitle(request.jobTitle())
+                .company(company)
+                .location(request.location())
+                .appliedDate(request.appliedDate())
+                .status(request.status())
+                .build();
+        return JobResponseDTO.fromEntity(jobRepository.save(job));
     }
 
     @Transactional
@@ -43,17 +54,29 @@ public class JobService {
 
     @Transactional
     public JobResponseDTO updateJob(Long id, JobRequestDTO request) {
-        return jobRepository.findById(id)
+        return jobRepository.findByIdWithCompany(id)
                 .map(job -> {
+                    Company company = findOrAddCompany(request.companyName(), request.companyJobPageLink());
+
                     job.setJobTitle(request.jobTitle());
-                    job.setCompany(request.company());
+                    job.setCompany(company);
                     job.setLocation(request.location());
                     job.setAppliedDate(request.appliedDate());
                     job.setStatus(request.status());
 
-                    Job updatedJob = jobRepository.save(job);
-                    return JobResponseDTO.fromEntity(updatedJob);
+                    return JobResponseDTO.fromEntity(jobRepository.save(job));
                 })
                 .orElseThrow(() -> new ResourceNotFoundException("Job with id=" + id + " not found"));
+    }
+
+    private Company findOrAddCompany(String name, String jobPageLink) {
+        Company company = companyRepository.findByNameIgnoreCase(name)
+                .orElseGet(() -> Company.builder().name(name).build());
+
+        if (jobPageLink != null && !jobPageLink.isBlank() && !jobPageLink.equals(company.getJobPageLink())) {
+            company.setJobPageLink(jobPageLink);
+        }
+
+        return companyRepository.save(company);
     }
 }
