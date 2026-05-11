@@ -70,7 +70,12 @@ const App = () => {
     <BrowserRouter>
       <Routes>
         <Route element={<Layout onAdd={onAdd} />}>
-          <Route path="/dashboard" element={<Dashboard jobs={jobs} onEdit={onEdit} onDelete={onDelete} />} />
+          <Route
+            path="/dashboard"
+            element={
+              <Dashboard jobs={jobs} onEdit={onEdit} onDelete={onDelete} />
+            }
+          />
           <Route path="/analytics" element={<Analytics />} />
         </Route>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />

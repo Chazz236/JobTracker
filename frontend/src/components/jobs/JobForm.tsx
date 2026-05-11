@@ -45,7 +45,10 @@ export const JobForm = ({ onSave, edit }: JobFormProps) => {
   useEffect(() => {
     if (edit) {
       const { id, ...data } = edit;
-      setJobData({ ...data, companyJobPageLink: data.companyJobPageLink || '' });
+      setJobData({
+        ...data,
+        companyJobPageLink: data.companyJobPageLink || '',
+      });
     } else {
       setJobData(resetJob);
     }
@@ -74,7 +77,9 @@ export const JobForm = ({ onSave, edit }: JobFormProps) => {
         />
       </div>
       <div className="grid gap-1.5">
-        <Label htmlFor="companyJobPageLink">Company Job Page Link (Optional)</Label>
+        <Label htmlFor="companyJobPageLink">
+          Company Job Page Link (Optional)
+        </Label>
         <Input
           id="companyJobPageLink"
           type="text"

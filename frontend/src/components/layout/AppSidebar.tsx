@@ -8,7 +8,12 @@ import {
   SidebarMenuButton,
   SidebarGroupContent,
 } from '@/components/ui/sidebar';
-import { LayoutDashboard, CirclePlus, Briefcase, ChartColumnStacked } from 'lucide-react';
+import {
+  LayoutDashboard,
+  CirclePlus,
+  Briefcase,
+  ChartColumnStacked,
+} from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
@@ -65,7 +70,10 @@ export const AppSidebar = ({ onAdd, ...props }: AppSidebarProps) => {
             <SidebarMenu className="mt-2">
               {nav.map((navItem) => (
                 <SidebarMenuItem key={navItem.title}>
-                  <SidebarMenuButton asChild isActive={location.pathname === navItem.url}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={location.pathname === navItem.url}
+                  >
                     <Link to={navItem.url}>
                       {navItem.icon && <navItem.icon />}
                       <span>{navItem.title}</span>

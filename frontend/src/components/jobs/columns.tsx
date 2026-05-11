@@ -12,70 +12,72 @@ export const columns = ({
   onEdit,
   onDelete,
 }: ColumnProps): ColumnDef<JobResponse>[] => [
-    {
-      accessorKey: 'jobTitle',
-      header: ({ column }) => (
-        <SortableHeader column={column} title="Job Title" />
-      ),
-      sortingFn: 'alphanumeric',
-    },
-    {
-      accessorKey: 'companyName',
-      header: ({ column }) => <SortableHeader column={column} title="Company" />,
-      cell: ({ row }) => {
-        const name = row.getValue('companyName') as string;
-        const link = row.original.companyJobPageLink;
+  {
+    accessorKey: 'jobTitle',
+    header: ({ column }) => (
+      <SortableHeader column={column} title="Job Title" />
+    ),
+    sortingFn: 'alphanumeric',
+  },
+  {
+    accessorKey: 'companyName',
+    header: ({ column }) => <SortableHeader column={column} title="Company" />,
+    cell: ({ row }) => {
+      const name = row.getValue('companyName') as string;
+      const link = row.original.companyJobPageLink;
 
-        if (!link) {
-          return <span>{name}</span>
-        }
+      if (!link) {
+        return <span>{name}</span>;
+      }
 
-        const linkFix = link.startsWith('http') ? link : `https://${link}`;
+      const linkFix = link.startsWith('http') ? link : `https://${link}`;
 
-        return (
-          <a href={linkFix} target="_blank" rel="noopener noreferrer">{name}</a>
-        );
-      },
-      sortingFn: 'alphanumeric',
+      return (
+        <a href={linkFix} target="_blank" rel="noopener noreferrer">
+          {name}
+        </a>
+      );
     },
-    {
-      accessorKey: 'location',
-      header: ({ column }) => <SortableHeader column={column} title="Location" />,
-      sortingFn: 'alphanumeric',
+    sortingFn: 'alphanumeric',
+  },
+  {
+    accessorKey: 'location',
+    header: ({ column }) => <SortableHeader column={column} title="Location" />,
+    sortingFn: 'alphanumeric',
+  },
+  {
+    accessorKey: 'appliedDate',
+    header: ({ column }) => (
+      <SortableHeader column={column} title="Applied Date" />
+    ),
+    sortingFn: 'alphanumeric',
+  },
+  {
+    accessorKey: 'status',
+    header: ({ column }) => (
+      <SortableHeader column={column} title="Application Status" />
+    ),
+    cell: ({ row }) => {
+      const status = row.getValue('status') as string;
+      return <span>{status.charAt(0) + status.slice(1).toLowerCase()}</span>;
     },
-    {
-      accessorKey: 'appliedDate',
-      header: ({ column }) => (
-        <SortableHeader column={column} title="Applied Date" />
-      ),
-      sortingFn: 'alphanumeric',
+    sortingFn: 'alphanumeric',
+  },
+  {
+    id: 'actions',
+    header: 'Actions',
+    cell: ({ row }) => {
+      const job = row.original;
+      return (
+        <div className="flex gap-2 items-center">
+          <Button variant="outline" onClick={() => onEdit(job)}>
+            Edit
+          </Button>
+          <Button variant="destructive" onClick={() => onDelete(job.id)}>
+            Delete
+          </Button>
+        </div>
+      );
     },
-    {
-      accessorKey: 'status',
-      header: ({ column }) => (
-        <SortableHeader column={column} title="Application Status" />
-      ),
-      cell: ({ row }) => {
-        const status = row.getValue('status') as string;
-        return <span>{status.charAt(0) + status.slice(1).toLowerCase()}</span>;
-      },
-      sortingFn: 'alphanumeric',
-    },
-    {
-      id: 'actions',
-      header: 'Actions',
-      cell: ({ row }) => {
-        const job = row.original;
-        return (
-          <div className="flex gap-2 items-center">
-            <Button variant="outline" onClick={() => onEdit(job)}>
-              Edit
-            </Button>
-            <Button variant="destructive" onClick={() => onDelete(job.id)}>
-              Delete
-            </Button>
-          </div>
-        );
-      },
-    },
-  ];
+  },
+];
