@@ -1,5 +1,6 @@
 package com.jobtracker.backend.controller;
 
+import com.jobtracker.backend.dto.CompanyResponseDTO;
 import com.jobtracker.backend.dto.JobRequestDTO;
 import com.jobtracker.backend.dto.JobResponseDTO;
 import com.jobtracker.backend.exception.JobServiceException;
@@ -49,11 +50,12 @@ public class JobControllerTest {
 
     @BeforeEach
     void setUp() {
+        CompanyResponseDTO companyResponseDTO = new CompanyResponseDTO(1L, "123 Computers", "123computers.com");
+
         response = new JobResponseDTO(
                 1L,
                 "Junior Developer",
-                "123 Computers",
-                "123computers.com",
+                companyResponseDTO,
                 "Brampton, ON",
                 LocalDate.of(2026, 4, 1),
                 JobStatus.APPLIED
@@ -81,7 +83,8 @@ public class JobControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.size()").value(1))
                     .andExpect(jsonPath("$[0].jobTitle").value("Junior Developer"))
-                    .andExpect(jsonPath("$[0].companyName").value("123 Computers"))
+                    .andExpect(jsonPath("$[0].company.name").value("123 Computers"))
+                    .andExpect(jsonPath("$[0].company.jobPageLink").value("123computers.com"))
                     .andExpect(jsonPath("$[0].id").value(1));
         }
 
@@ -114,11 +117,11 @@ public class JobControllerTest {
             when(jobService.createJob(any(JobRequestDTO.class))).thenReturn(response);
 
             mockmvc.perform(post("/api/jobs")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(request)))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.jobTitle").value("Junior Developer"))
-                    .andExpect(jsonPath("$.companyName").value("123 Computers"))
+                    .andExpect(jsonPath("$.company.name").value("123 Computers"))
                     .andExpect(jsonPath("$.id").value(1));
 
             verify(jobService).createJob(any(JobRequestDTO.class));
@@ -208,7 +211,6 @@ public class JobControllerTest {
         @DisplayName("PUT /api/jobs/{id} - Should update a job")
         void shouldUpdateJob() throws Exception {
             Long id = 1L;
-
             JobRequestDTO updatedRequest = new JobRequestDTO(
                     "Senior Developer",
                     "123 Computers",
@@ -217,12 +219,11 @@ public class JobControllerTest {
                     LocalDate.of(2026, 4, 2),
                     JobStatus.INTERVIEWING
             );
-
+            CompanyResponseDTO companyResponseDTO = new CompanyResponseDTO(1L, "123 Computers", "123computers.com");
             JobResponseDTO updatedResponse = new JobResponseDTO(
                     id,
                     "Senior Developer",
-                    "123 Computers",
-                    "123computers.com",
+                    companyResponseDTO,
                     "Toronto, ON",
                     LocalDate.of(2026, 4, 2),
                     JobStatus.INTERVIEWING
@@ -235,7 +236,7 @@ public class JobControllerTest {
                             .content(objectMapper.writeValueAsString(updatedRequest)))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.jobTitle").value("Senior Developer"))
-                    .andExpect(jsonPath("$.companyName").value("123 Computers"));
+                    .andExpect(jsonPath("$.company.name").value("123 Computers"));
 
             verify(jobService).updateJob(eq(id), any(JobRequestDTO.class));
         }
@@ -244,7 +245,6 @@ public class JobControllerTest {
         @DisplayName("PUT /api/jobs/{id} - Should return error status when job not found")
         void shouldReturnErrorWhenJobNotFound() throws Exception {
             Long id = 100L;
-
             JobRequestDTO updatedRequest = new JobRequestDTO(
                     "Senior Developer",
                     "123 Computers",

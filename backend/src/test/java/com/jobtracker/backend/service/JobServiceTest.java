@@ -6,7 +6,6 @@ import com.jobtracker.backend.exception.ResourceNotFoundException;
 import com.jobtracker.backend.model.Company;
 import com.jobtracker.backend.model.Job;
 import com.jobtracker.backend.model.JobStatus;
-import com.jobtracker.backend.repository.CompanyRepository;
 import com.jobtracker.backend.repository.JobRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,6 +24,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -35,7 +35,7 @@ public class JobServiceTest {
     private JobRepository jobRepository;
 
     @Mock
-    private CompanyRepository companyRepository;
+    private CompanyService companyService;
 
     @InjectMocks
     private JobService jobService;
@@ -86,7 +86,6 @@ public class JobServiceTest {
             assertThat(response).hasSize(2);
             assertThat(response.getLast().jobTitle()).isEqualTo("Junior Developer");
             assertThat(response.getFirst().jobTitle()).isEqualTo("Senior Developer");
-
             verify(jobRepository).findAllWithCompany(any(Sort.class));
         }
 
@@ -98,7 +97,6 @@ public class JobServiceTest {
             List<JobResponseDTO> response = jobService.getAllJobs();
 
             assertThat(response).isEmpty();
-
             verify(jobRepository).findAllWithCompany(any(Sort.class));
         }
     }
@@ -107,11 +105,9 @@ public class JobServiceTest {
     @DisplayName("Create Jobs")
     class CreateJobTests {
         @Test
-        @DisplayName("Should create a job with an existing company")
-        void shouldCreateJobWithExistingCompany() {
-            when(companyRepository.findByNameIgnoreCase(request.companyName()))
-                    .thenReturn(Optional.of(company));
-            when(companyRepository.save(any(Company.class))).thenReturn(company);
+        @DisplayName("Should create a job")
+        void shouldCreateJob() {
+            when(companyService.findOrAddCompany(anyString(), anyString())).thenReturn(company);
             when(jobRepository.save(any(Job.class))).thenReturn(job);
 
             JobResponseDTO response = jobService.createJob(request);
@@ -119,30 +115,8 @@ public class JobServiceTest {
             assertThat(response).isNotNull();
             assertThat(response.id()).isEqualTo(1L);
             assertThat(response.jobTitle()).isEqualTo("Junior Developer");
-            assertThat(response.companyName()).isEqualTo("123 Computers");
-
-            verify(companyRepository).findByNameIgnoreCase(request.companyName());
-            verify(companyRepository).save(any(Company.class));
-            verify(jobRepository).save(any(Job.class));
-        }
-
-        @Test
-        @DisplayName("Should create a new company then a new job")
-        void shouldCreateCompanyThenJob() {
-            when(companyRepository.findByNameIgnoreCase(request.companyName()))
-                    .thenReturn(Optional.empty());
-            when(companyRepository.save(any(Company.class))).thenReturn(company);
-            when(jobRepository.save(any(Job.class))).thenReturn(job);
-
-            JobResponseDTO response = jobService.createJob(request);
-
-            assertThat(response).isNotNull();
-            assertThat(response.id()).isEqualTo(1L);
-            assertThat(response.jobTitle()).isEqualTo("Junior Developer");
-            assertThat(response.companyName()).isEqualTo("123 Computers");
-
-            verify(companyRepository).findByNameIgnoreCase(request.companyName());
-            verify(companyRepository).save(any(Company.class));
+            assertThat(response.company().name()).isEqualTo("123 Computers");
+            verify(companyService).findOrAddCompany(request.companyName(), request.companyJobPageLink());
             verify(jobRepository).save(any(Job.class));
         }
     }
@@ -172,7 +146,6 @@ public class JobServiceTest {
             assertThatThrownBy(() -> jobService.deleteJob(id))
                     .isInstanceOf(ResourceNotFoundException.class)
                     .hasMessage("Job with id=" + id + " not found");
-
             verify(jobRepository, never()).deleteById(id);
         }
     }
@@ -195,8 +168,7 @@ public class JobServiceTest {
             );
 
             when(jobRepository.findByIdWithCompany(id)).thenReturn(Optional.of(job));
-            when(companyRepository.findByNameIgnoreCase("123 Computers")).thenReturn(Optional.of(company));
-            when(companyRepository.save(any(Company.class))).thenReturn(company);
+            when(companyService.findOrAddCompany(anyString(), anyString())).thenReturn(company);
             when(jobRepository.save(any(Job.class))).thenAnswer(i -> i.getArgument(0));
 
             JobResponseDTO response = jobService.updateJob(id, updateRequest);
@@ -205,7 +177,8 @@ public class JobServiceTest {
             assertThat(response.id()).isEqualTo(id);
             assertThat(response.jobTitle()).isEqualTo("Senior Developer");
             assertThat(response.status()).isEqualTo(JobStatus.INTERVIEWING);
-
+            assertThat(response.company().name()).isEqualTo("123 Computers");
+            verify(companyService).findOrAddCompany(updateRequest.companyName(), updateRequest.companyJobPageLink());
             verify(jobRepository).findByIdWithCompany(id);
             verify(jobRepository).save(any(Job.class));
         }
@@ -220,7 +193,6 @@ public class JobServiceTest {
             assertThatThrownBy(() -> jobService.updateJob(id, request))
                     .isInstanceOf(ResourceNotFoundException.class)
                     .hasMessage("Job with id=" + id + " not found");
-
             verify(jobRepository, never()).save(any());
         }
     }

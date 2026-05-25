@@ -13,11 +13,8 @@ public record JobResponseDTO(
         @Schema(description = "Title of job position", example = "Junior Developer")
         String jobTitle,
 
-        @Schema(description = "Name of company", example = "Google")
-        String companyName,
-
-        @Schema(description = "Link to the company's career page", example = "https://google.com/careers")
-        String companyJobPageLink,
+        @Schema(description = "Company details")
+        CompanyResponseDTO company,
 
         @Schema(description = "Location of job", example = "Toronto, Canada")
         String location,
@@ -32,8 +29,7 @@ public record JobResponseDTO(
         return new JobResponseDTO(
                 job.getId(),
                 job.getJobTitle(),
-                job.getCompany().getName(),
-                job.getCompany().getJobPageLink(),
+                CompanyResponseDTO.fromEntity(job.getCompany()),
                 job.getLocation(),
                 job.getAppliedDate(),
                 job.getStatus()

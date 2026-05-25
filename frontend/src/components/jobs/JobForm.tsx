@@ -37,17 +37,20 @@ export const JobForm = ({ onSave, edit }: JobFormProps) => {
   };
 
   const onChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement> //const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   ) => {
     setJobData({ ...jobData, [e.target.id]: e.target.value });
   };
 
   useEffect(() => {
     if (edit) {
-      const { id, ...data } = edit;
       setJobData({
-        ...data,
-        companyJobPageLink: data.companyJobPageLink || '',
+        jobTitle: edit.jobTitle,
+        companyName: edit.company.name,
+        companyJobPageLink: edit.company.jobPageLink || '',
+        location: edit.location,
+        appliedDate: edit.appliedDate,
+        status: edit.status
       });
     } else {
       setJobData(resetJob);

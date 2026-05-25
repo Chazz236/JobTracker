@@ -5,7 +5,6 @@ import com.jobtracker.backend.dto.JobResponseDTO;
 import com.jobtracker.backend.exception.ResourceNotFoundException;
 import com.jobtracker.backend.model.Company;
 import com.jobtracker.backend.model.Job;
-import com.jobtracker.backend.repository.CompanyRepository;
 import com.jobtracker.backend.repository.JobRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JobService {
     private final JobRepository jobRepository;
-    private final CompanyRepository companyRepository;
+    private final CompanyService companyService;
 
     public List<JobResponseDTO> getAllJobs() {
         return jobRepository.findAllWithCompany(Sort.by(Sort.Direction.DESC, "id"))
@@ -33,7 +32,7 @@ public class JobService {
 
     @Transactional
     public JobResponseDTO createJob(JobRequestDTO request) {
-        Company company = findOrAddCompany(request.companyName(), request.companyJobPageLink());
+        Company company = companyService.findOrAddCompany(request.companyName(), request.companyJobPageLink());
         Job job = Job.builder()
                 .jobTitle(request.jobTitle())
                 .company(company)
@@ -56,7 +55,7 @@ public class JobService {
     public JobResponseDTO updateJob(Long id, JobRequestDTO request) {
         return jobRepository.findByIdWithCompany(id)
                 .map(job -> {
-                    Company company = findOrAddCompany(request.companyName(), request.companyJobPageLink());
+                    Company company = companyService.findOrAddCompany(request.companyName(), request.companyJobPageLink());
 
                     job.setJobTitle(request.jobTitle());
                     job.setCompany(company);
@@ -67,16 +66,5 @@ public class JobService {
                     return JobResponseDTO.fromEntity(jobRepository.save(job));
                 })
                 .orElseThrow(() -> new ResourceNotFoundException("Job with id=" + id + " not found"));
-    }
-
-    private Company findOrAddCompany(String name, String jobPageLink) {
-        Company company = companyRepository.findByNameIgnoreCase(name)
-                .orElseGet(() -> Company.builder().name(name).build());
-
-        if (jobPageLink != null && !jobPageLink.isBlank() && !jobPageLink.equals(company.getJobPageLink())) {
-            company.setJobPageLink(jobPageLink);
-        }
-
-        return companyRepository.save(company);
     }
 }

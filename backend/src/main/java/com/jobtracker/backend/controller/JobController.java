@@ -38,8 +38,8 @@ public class JobController {
     @Operation(summary = "Get all jobs", description = "Returns a list of all job applications stored in the database")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved jobs")
     @GetMapping
-    public List<JobResponseDTO> getAllJobs() {
-        return jobService.getAllJobs();
+    public ResponseEntity<List<JobResponseDTO>> getAllJobs() {
+        return ResponseEntity.ok(jobService.getAllJobs());
     }
 
     @Operation(summary = "Create a new job", description = "Saves a new job application in the database")
