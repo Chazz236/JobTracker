@@ -50,7 +50,7 @@ export const JobForm = ({ onSave, edit }: JobFormProps) => {
         companyJobPageLink: edit.company.jobPageLink || '',
         location: edit.location,
         appliedDate: edit.appliedDate,
-        status: edit.status
+        status: edit.status,
       });
     } else {
       setJobData(resetJob);
@@ -64,6 +64,7 @@ export const JobForm = ({ onSave, edit }: JobFormProps) => {
         <Input
           id="jobTitle"
           type="text"
+          maxLength={150}
           value={jobData.jobTitle}
           onChange={onChange}
           required
@@ -74,6 +75,7 @@ export const JobForm = ({ onSave, edit }: JobFormProps) => {
         <Input
           id="companyName"
           type="text"
+          maxLength={150}
           value={jobData.companyName}
           onChange={onChange}
           required
@@ -86,6 +88,7 @@ export const JobForm = ({ onSave, edit }: JobFormProps) => {
         <Input
           id="companyJobPageLink"
           type="text"
+          maxLength={1000}
           value={jobData.companyJobPageLink}
           onChange={onChange}
         />
@@ -95,6 +98,7 @@ export const JobForm = ({ onSave, edit }: JobFormProps) => {
         <Input
           id="location"
           type="text"
+          maxLength={150}
           value={jobData.location}
           onChange={onChange}
           required
