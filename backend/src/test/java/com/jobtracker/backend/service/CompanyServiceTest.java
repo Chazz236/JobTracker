@@ -51,7 +51,7 @@ public class CompanyServiceTest {
         }
 
         @Test
-        @DisplayName("Should return empty list for empty input")
+        @DisplayName("Should return empty list if no companies in database")
         void shouldReturnEmptyListForEmpty() {
             when(companyRepository.findAll(Sort.by(Sort.Direction.ASC, "name"))).thenReturn(List.of());
 
@@ -103,7 +103,7 @@ public class CompanyServiceTest {
             Company result = companyService.findOrAddCompany("Google", "");
 
             assertThat(result.getName()).isEqualTo("Google");
-            assertThat(result.getJobPageLink()).isEqualTo("google.ca");
+            assertThat(result.getJobPageLink()).isNull();
             verify(companyRepository).save(any(Company.class));
         }
     }

@@ -93,8 +93,8 @@ public class JobRepositoryTest {
     @DisplayName("Find Job By Id With Company")
     class FindJobByIdWithCompanyTests {
         @Test
-        @DisplayName("Should return all jobs with company id")
-        void shouldReturnAllJobsWithCompanyId() {
+        @DisplayName("Should return job with company id")
+        void shouldReturnJobWithCompanyId() {
             Company google = companyRepository.save(Company.builder().name("Google").build());
 
             Job job = Job.builder()
