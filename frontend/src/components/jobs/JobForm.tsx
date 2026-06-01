@@ -1,5 +1,10 @@
 import { useEffect, useState } from 'react';
-import { type CompanyResponse, type JobRequest, type JobResponse, JobStatus } from '@/types';
+import {
+  type CompanyResponse,
+  type JobRequest,
+  type JobResponse,
+  JobStatus,
+} from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,7 +17,11 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { getAllCompanies } from '@/services/companyService';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { useQuery } from '@tanstack/react-query';
 
 interface JobFormProps {
@@ -68,15 +77,19 @@ export const JobForm = ({ onSave, edit }: JobFormProps) => {
 
   const onCompanyNameChange = (value: string | null) => {
     const name = value ?? '';
-    const existingCompany = companies.find(c => c.name.toLowerCase() === name.toLowerCase());
-    setJobData(prev => ({
+    const existingCompany = companies.find(
+      (c) => c.name.toLowerCase() === name.toLowerCase()
+    );
+    setJobData((prev) => ({
       ...prev,
       companyName: name,
-      companyJobPageLink: existingCompany ? (existingCompany.jobPageLink || '') : prev.companyJobPageLink,
+      companyJobPageLink: existingCompany
+        ? existingCompany.jobPageLink || ''
+        : prev.companyJobPageLink,
     }));
   };
 
-  const filteredCompanies = companies.filter(company =>
+  const filteredCompanies = companies.filter((company) =>
     company.name.toLowerCase().includes(jobData.companyName.toLowerCase())
   );
 
@@ -95,7 +108,10 @@ export const JobForm = ({ onSave, edit }: JobFormProps) => {
       </div>
       <div className="grid gap-1.5">
         <Label htmlFor="companyName">Company Name</Label>
-        <Popover open={open && filteredCompanies.length > 0} onOpenChange={setOpen}>
+        <Popover
+          open={open && filteredCompanies.length > 0}
+          onOpenChange={setOpen}
+        >
           <PopoverTrigger asChild>
             <Input
               id="companyName"

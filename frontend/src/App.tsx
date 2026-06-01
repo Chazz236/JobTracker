@@ -19,7 +19,11 @@ const App = () => {
 
   const queryClient = useQueryClient();
 
-  const { isPending, error, data: jobs = [] } = useQuery<JobResponse[]>({
+  const {
+    isPending,
+    error,
+    data: jobs = [],
+  } = useQuery<JobResponse[]>({
     queryKey: ['jobs'],
     queryFn: getAllJobs,
   });
@@ -51,7 +55,7 @@ const App = () => {
     },
     onError: (e) => {
       console.error("Can't save job:", e);
-    }
+    },
   });
 
   const onSave = (job: JobRequest) => {
@@ -65,7 +69,7 @@ const App = () => {
     },
     onError: (e) => {
       console.error("Can't delete job:", e);
-    }
+    },
   });
 
   const onDelete = (id: number) => {
@@ -73,11 +77,19 @@ const App = () => {
   };
 
   if (isPending) {
-    return <div className="flex h-screen items-center justify-center">Loading...</div>;
+    return (
+      <div className="flex h-screen items-center justify-center">
+        Loading...
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="flex h-screen items-center justify-center text-red-500">An error has occurred: {error.message}</div>;
+    return (
+      <div className="flex h-screen items-center justify-center text-red-500">
+        An error has occurred: {error.message}
+      </div>
+    );
   }
 
   return (
