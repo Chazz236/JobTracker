@@ -1,5 +1,5 @@
 import Dashboard from './pages/Dashboard';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { JobDialog } from './components/jobs/JobDialog';
 import type { JobRequest, JobResponse } from '@/types';
 import {
@@ -10,24 +10,19 @@ import {
 } from './services/jobService';
 import { Layout } from './components/layout/Layout';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Analytics from './pages/Analytics';
 
 const App = () => {
-  const [jobs, setJobs] = useState<JobResponse[]>([]);
   const [edit, setEdit] = useState<JobResponse | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  useEffect(() => {
-    const getJobs = async () => {
-      try {
-        const data = await getAllJobs();
-        setJobs(data);
-      } catch (e) {
-        console.error("Can't get jobs:", e);
-      }
-    };
-    getJobs();
-  }, []);
+  const queryClient = useQueryClient();
+
+  const { isPending, error, data: jobs = [] } = useQuery<JobResponse[]>({
+    queryKey: ['jobs'],
+    queryFn: getAllJobs,
+  });
 
   const onAdd = () => {
     setEdit(null);
@@ -39,32 +34,51 @@ const App = () => {
     setIsDialogOpen(true);
   };
 
-  const onSave = async (job: JobRequest) => {
-    try {
+  const saveMutation = useMutation({
+    mutationFn: async (job: JobRequest) => {
       if (edit) {
-        const updatedJob = await updateJob(edit.id, job);
-        setJobs((prevJobs) =>
-          prevJobs.map((j) => (j.id === edit.id ? updatedJob : j))
-        );
-        setEdit(null);
+        return await updateJob(edit.id, job);
       } else {
-        const newJob = await createJob(job);
-        setJobs((prevJobs) => [...prevJobs, newJob]);
+        return await createJob(job);
       }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['jobs'] });
+      queryClient.invalidateQueries({ queryKey: ['companies'] });
+
+      setEdit(null);
       setIsDialogOpen(false);
-    } catch (e) {
+    },
+    onError: (e) => {
       console.error("Can't save job:", e);
     }
+  });
+
+  const onSave = (job: JobRequest) => {
+    saveMutation.mutate(job);
   };
 
-  const onDelete = async (id: number) => {
-    try {
-      await deleteJob(id);
-      setJobs((prevJobs) => prevJobs.filter((job) => job.id !== id));
-    } catch (e) {
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => deleteJob(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['jobs'] });
+    },
+    onError: (e) => {
       console.error("Can't delete job:", e);
     }
+  });
+
+  const onDelete = (id: number) => {
+    deleteMutation.mutate(id);
   };
+
+  if (isPending) {
+    return <div className="flex h-screen items-center justify-center">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="flex h-screen items-center justify-center text-red-500">An error has occurred: {error.message}</div>;
+  }
 
   return (
     <BrowserRouter>

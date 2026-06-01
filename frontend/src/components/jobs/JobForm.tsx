@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/select';
 import { getAllCompanies } from '@/services/companyService';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { useQuery } from '@tanstack/react-query';
 
 interface JobFormProps {
   onSave: (job: JobRequest) => void;
@@ -32,7 +33,6 @@ export const JobForm = ({ onSave, edit }: JobFormProps) => {
   };
 
   const [jobData, setJobData] = useState<JobRequest>(resetJob);
-  const [companies, setCompanies] = useState<CompanyResponse[]>([]);
   const [open, setOpen] = useState(false);
 
   const onSubmit = (e: React.SubmitEvent) => {
@@ -61,17 +61,10 @@ export const JobForm = ({ onSave, edit }: JobFormProps) => {
     }
   }, [edit]);
 
-  useEffect(() => {
-    const getCompanies = async () => {
-      try {
-        const data = await getAllCompanies();
-        setCompanies(data);
-      } catch (e) {
-        console.error("Can't get companies:", e);
-      }
-    };
-    getCompanies();
-  }, []);
+  const { data: companies = [] } = useQuery<CompanyResponse[]>({
+    queryKey: ['companies'],
+    queryFn: getAllCompanies,
+  });
 
   const onCompanyNameChange = (value: string | null) => {
     const name = value ?? '';
