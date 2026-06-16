@@ -126,4 +126,67 @@ public class JobRepositoryTest {
             assertThat(result).isEmpty();
         }
     }
+
+    @Nested
+    @DisplayName("Count Jobs By Status")
+    class CountJobsByStatusTests {
+        @Test
+        @DisplayName("Should return correct status counts grouped properly")
+        void shouldReturnCorrectStatusCounts() {
+            Company company = companyRepository.save(Company.builder().name("123 Computers").build());
+
+            Job job1 = Job.builder()
+                    .jobTitle("Junior Developer")
+                    .location("Toronto")
+                    .appliedDate(LocalDate.of(2026, 4, 1))
+                    .status(JobStatus.APPLIED)
+                    .company(company)
+                    .build();
+            Job job2 = Job.builder()
+                    .jobTitle("Junior Engineer")
+                    .location("Chicago")
+                    .appliedDate(LocalDate.of(2026, 5, 1))
+                    .status(JobStatus.REJECTED)
+                    .company(company)
+                    .build();
+            Job job3 = Job.builder()
+                    .jobTitle("Owner")
+                    .location("Brampton")
+                    .appliedDate(LocalDate.of(2026, 5, 2))
+                    .status(JobStatus.APPLIED)
+                    .company(company)
+                    .build();
+
+            jobRepository.save(job1);
+            jobRepository.save(job2);
+            jobRepository.save(job3);
+
+            entityManager.flush();
+            entityManager.clear();
+
+            List<JobStatusCount> result = jobRepository.countJobsByStatus();
+
+            assertThat(result).hasSize(2);
+
+            JobStatusCount applied = result.stream()
+                    .filter(r -> r.getStatus().equals(JobStatus.APPLIED.name()))
+                    .findFirst()
+                    .orElseThrow();
+
+            JobStatusCount rejected = result.stream()
+                    .filter(r -> r.getStatus().equals(JobStatus.REJECTED.name()))
+                    .findFirst()
+                    .orElseThrow();
+
+            assertThat(applied.getCount()).isEqualTo(2L);
+            assertThat(rejected.getCount()).isEqualTo(1L);
+        }
+
+        @Test
+        @DisplayName("Should return empty list when no jobs exist")
+        void shouldReturnEmptyListWhenNoJobs() {
+            List<JobStatusCount> results = jobRepository.countJobsByStatus();
+            assertThat(results).isEmpty();
+        }
+    }
 }
