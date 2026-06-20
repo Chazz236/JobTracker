@@ -1,7 +1,6 @@
 package com.jobtracker.backend.controller;
 
 import com.jobtracker.backend.dto.CompanyResponseDTO;
-import com.jobtracker.backend.model.Company;
 import com.jobtracker.backend.service.CompanyService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
