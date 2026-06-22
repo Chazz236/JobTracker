@@ -1,6 +1,6 @@
 package com.jobtracker.backend.service;
 
-import com.jobtracker.backend.dto.AnalyticsResponseDTO;
+import com.jobtracker.backend.dto.DashboardAnalyticsResponseDTO;
 import com.jobtracker.backend.repository.JobRepository;
 import com.jobtracker.backend.repository.JobStatusCount;
 import org.junit.jupiter.api.DisplayName;
@@ -46,7 +46,7 @@ public class AnalyticsServiceTest {
 
             when(jobRepository.countJobsByStatus()).thenReturn(List.of(status1, status2, status3));
 
-            AnalyticsResponseDTO response = analyticsService.getDashboardAnalytics();
+            DashboardAnalyticsResponseDTO response = analyticsService.getDashboardAnalytics();
 
             assertThat(response).isNotNull();
             assertThat(response.totalApps()).isEqualTo(18L);
@@ -63,7 +63,7 @@ public class AnalyticsServiceTest {
         void shouldReturnZeroJobs() {
             when(jobRepository.countJobsByStatus()).thenReturn(List.of());
 
-            AnalyticsResponseDTO response = analyticsService.getDashboardAnalytics();
+            DashboardAnalyticsResponseDTO response = analyticsService.getDashboardAnalytics();
 
             assertThat(response.totalApps()).isEqualTo(0L);
             assertThat(response.countByStatus()).isEmpty();

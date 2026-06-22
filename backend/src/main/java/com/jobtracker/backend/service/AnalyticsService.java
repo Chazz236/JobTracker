@@ -1,6 +1,6 @@
 package com.jobtracker.backend.service;
 
-import com.jobtracker.backend.dto.AnalyticsResponseDTO;
+import com.jobtracker.backend.dto.DashboardAnalyticsResponseDTO;
 import com.jobtracker.backend.repository.JobRepository;
 import com.jobtracker.backend.repository.JobStatusCount;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +18,8 @@ import java.util.List;
 public class AnalyticsService {
     private final JobRepository jobRepository;
 
-    public AnalyticsResponseDTO getDashboardAnalytics() {
+    public DashboardAnalyticsResponseDTO getDashboardAnalytics() {
         List<JobStatusCount> counts = jobRepository.countJobsByStatus();
-        return AnalyticsResponseDTO.fromProjection(counts);
+        return DashboardAnalyticsResponseDTO.fromProjection(counts);
     }
 }
