@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import {
-  type CompanyResponse,
   type JobRequest,
   type JobResponse,
   JobStatus,
@@ -16,13 +15,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { getAllCompanies } from '@/services/companyService';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { useQuery } from '@tanstack/react-query';
+import { useCompanies } from '@/hooks/useCompanies';
 
 interface JobFormProps {
   onSave: (job: JobRequest) => void;
@@ -43,6 +41,8 @@ export const JobForm = ({ onSave, edit }: JobFormProps) => {
 
   const [jobData, setJobData] = useState<JobRequest>(resetJob);
   const [open, setOpen] = useState(false);
+
+  const { companies } = useCompanies();
 
   const onSubmit = (e: React.SubmitEvent) => {
     e.preventDefault();
@@ -69,11 +69,6 @@ export const JobForm = ({ onSave, edit }: JobFormProps) => {
       setJobData(resetJob);
     }
   }, [edit]);
-
-  const { data: companies = [] } = useQuery<CompanyResponse[]>({
-    queryKey: ['companies'],
-    queryFn: getAllCompanies,
-  });
 
   const onCompanyNameChange = (value: string | null) => {
     const name = value ?? '';
