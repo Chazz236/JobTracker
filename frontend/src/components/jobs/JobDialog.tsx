@@ -38,6 +38,7 @@ export const JobDialog = ({
             onSave(data);
             onOpenChange(false);
           }}
+          key={edit ? edit.id : 'new'}
         />
       </DialogContent>
     </Dialog>

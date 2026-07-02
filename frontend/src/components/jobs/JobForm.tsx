@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   type JobRequest,
   type JobResponse,
@@ -27,19 +27,28 @@ interface JobFormProps {
   edit: JobResponse | null;
 }
 
+const getTodayString = () => new Date().toISOString().split('T')[0];
+
+const resetJob = (): JobRequest => ({
+  jobTitle: '',
+  companyName: '',
+  companyJobPageLink: '',
+  location: '',
+  appliedDate: getTodayString(),
+  status: JobStatus.APPLIED,
+});
+
 export const JobForm = ({ onSave, edit }: JobFormProps) => {
-  const getTodayString = () => new Date().toISOString().split('T')[0];
-
-  const resetJob: JobRequest = {
-    jobTitle: '',
-    companyName: '',
-    companyJobPageLink: '',
-    location: '',
-    appliedDate: getTodayString(),
-    status: JobStatus.APPLIED,
-  };
-
-  const [jobData, setJobData] = useState<JobRequest>(resetJob);
+  const [jobData, setJobData] = useState<JobRequest>(edit ?
+    {
+      jobTitle: edit.jobTitle,
+      companyName: edit.company.name,
+      companyJobPageLink: edit.company.jobPageLink || '',
+      location: edit.location,
+      appliedDate: edit.appliedDate,
+      status: edit.status,
+    } : resetJob()
+  );
   const [open, setOpen] = useState(false);
 
   const { companies } = useCompanies();
@@ -54,21 +63,6 @@ export const JobForm = ({ onSave, edit }: JobFormProps) => {
   ) => {
     setJobData({ ...jobData, [e.target.id]: e.target.value });
   };
-
-  useEffect(() => {
-    if (edit) {
-      setJobData({
-        jobTitle: edit.jobTitle,
-        companyName: edit.company.name,
-        companyJobPageLink: edit.company.jobPageLink || '',
-        location: edit.location,
-        appliedDate: edit.appliedDate,
-        status: edit.status,
-      });
-    } else {
-      setJobData(resetJob);
-    }
-  }, [edit]);
 
   const onCompanyNameChange = (value: string | null) => {
     const name = value ?? '';
