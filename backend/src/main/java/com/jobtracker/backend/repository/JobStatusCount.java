@@ -1,6 +1,8 @@
 package com.jobtracker.backend.repository;
 
+import com.jobtracker.backend.model.JobStatus;
+
 public interface JobStatusCount {
-    String getStatus();
+    JobStatus getStatus();
     Long getCount();
 }

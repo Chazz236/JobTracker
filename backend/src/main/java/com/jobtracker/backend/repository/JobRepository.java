@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,4 +24,10 @@ public interface JobRepository extends JpaRepository<Job, Long> {
 
     @Query("SELECT j.status AS status, COUNT(j) AS count FROM Job j GROUP BY j.status")
     List<JobStatusCount> countJobsByStatus();
+
+    @Query("SELECT COUNT(j) FROM Job j WHERE j.appliedDate >= :startDate AND j.appliedDate < :endDate")
+    Long countApplicationsBetweenDates(LocalDate startDate, LocalDate endDate);
+
+    @Query("SELECT MAX(j.appliedDate) FROM Job j")
+    Optional<LocalDate> findMostRecentApplication();
 }

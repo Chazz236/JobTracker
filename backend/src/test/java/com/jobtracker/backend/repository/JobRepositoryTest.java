@@ -30,9 +30,9 @@ public class JobRepositoryTest {
 
     @Nested
     @DisplayName("Find All Jobs With Company")
-    class FindAllWithCompanyTests {
+    class FindAllJobsWithCompanyTests {
         @Test
-        @DisplayName("Return all jobs with company")
+        @DisplayName("Should return all jobs with company")
         void shouldReturnJobsWithCompany() {
             Company google = companyRepository.save(Company.builder().name("Google").build());
             Company apple = companyRepository.save(Company.builder().name("Apple").build());
@@ -169,12 +169,12 @@ public class JobRepositoryTest {
             assertThat(result).hasSize(2);
 
             JobStatusCount applied = result.stream()
-                    .filter(r -> r.getStatus().equals(JobStatus.APPLIED.name()))
+                    .filter(r -> r.getStatus() == JobStatus.APPLIED)
                     .findFirst()
                     .orElseThrow();
 
             JobStatusCount rejected = result.stream()
-                    .filter(r -> r.getStatus().equals(JobStatus.REJECTED.name()))
+                    .filter(r -> r.getStatus() == JobStatus.REJECTED)
                     .findFirst()
                     .orElseThrow();
 
@@ -186,7 +186,166 @@ public class JobRepositoryTest {
         @DisplayName("Should return empty list when no jobs exist")
         void shouldReturnEmptyListWhenNoJobs() {
             List<JobStatusCount> results = jobRepository.countJobsByStatus();
+
             assertThat(results).isEmpty();
+        }
+    }
+
+    @Nested
+    @DisplayName("Count Applications Between Dates")
+    class CountApplicationsBetweenDatesTests {
+        @Test
+        @DisplayName("Should return number of applications between dates")
+        void shouldReturnCountBetweenDates() {
+            Company company = companyRepository.save(Company.builder().name("123 Computers").build());
+
+            Job job1 = Job.builder()
+                    .jobTitle("Junior Developer")
+                    .location("Toronto")
+                    .appliedDate(LocalDate.of(2026, 4, 1))
+                    .status(JobStatus.APPLIED)
+                    .company(company)
+                    .build();
+            Job job2 = Job.builder()
+                    .jobTitle("Junior Engineer")
+                    .location("Chicago")
+                    .appliedDate(LocalDate.of(2026, 5, 1))
+                    .status(JobStatus.REJECTED)
+                    .company(company)
+                    .build();
+            Job job3 = Job.builder()
+                    .jobTitle("Owner")
+                    .location("Brampton")
+                    .appliedDate(LocalDate.of(2026, 6, 1))
+                    .status(JobStatus.APPLIED)
+                    .company(company)
+                    .build();
+            Job job4 = Job.builder()
+                    .jobTitle("President")
+                    .location("Ottawa")
+                    .appliedDate(LocalDate.of(2026, 7, 1))
+                    .status(JobStatus.OFFERED)
+                    .company(company)
+                    .build();
+
+            jobRepository.save(job1);
+            jobRepository.save(job2);
+            jobRepository.save(job3);
+            jobRepository.save(job4);
+
+            entityManager.flush();
+            entityManager.clear();
+
+            Long result = jobRepository.countApplicationsBetweenDates(
+                    LocalDate.of(2026, 5, 1),
+                    LocalDate.of(2026, 7, 1)
+            );
+
+            assertThat(result).isEqualTo(2L);
+        }
+
+        @Test
+        @DisplayName("Should return 0 applications when no jobs exists")
+        void shouldReturnZeroWhenNoJobs() {
+            Long result = jobRepository.countApplicationsBetweenDates(
+                    LocalDate.of(2026, 5, 1),
+                    LocalDate.of(2026, 7, 1)
+            );
+
+            assertThat(result).isEqualTo(0L);
+        }
+
+        @Test
+        @DisplayName("Should return 0 applications when no jobs between dates")
+        void shouldReturnZeroWhenNoJobsBetweenDates() {
+            Company company = companyRepository.save(Company.builder().name("123 Computers").build());
+
+            Job job1 = Job.builder()
+                    .jobTitle("Junior Developer")
+                    .location("Toronto")
+                    .appliedDate(LocalDate.of(2026, 4, 1))
+                    .status(JobStatus.APPLIED)
+                    .company(company)
+                    .build();
+            Job job2 = Job.builder()
+                    .jobTitle("Junior Engineer")
+                    .location("Chicago")
+                    .appliedDate(LocalDate.of(2026, 5, 1))
+                    .status(JobStatus.REJECTED)
+                    .company(company)
+                    .build();
+            Job job3 = Job.builder()
+                    .jobTitle("Owner")
+                    .location("Brampton")
+                    .appliedDate(LocalDate.of(2026, 6, 1))
+                    .status(JobStatus.APPLIED)
+                    .company(company)
+                    .build();
+
+            jobRepository.save(job1);
+            jobRepository.save(job2);
+            jobRepository.save(job3);
+
+            entityManager.flush();
+            entityManager.clear();
+
+            Long result = jobRepository.countApplicationsBetweenDates(
+                    LocalDate.of(2026, 7, 1),
+                    LocalDate.of(2026, 8, 1)
+            );
+
+            assertThat(result).isEqualTo(0L);
+        }
+    }
+
+    @Nested
+    @DisplayName("Find Most Recent Application")
+    class FindMostRecentApplicationTests {
+        @Test
+        @DisplayName("Should return most recent application date")
+        void shouldReturnMostRecentDate() {
+            Company company = companyRepository.save(Company.builder().name("123 Computers").build());
+
+            Job job1 = Job.builder()
+                    .jobTitle("Junior Developer")
+                    .location("Toronto")
+                    .appliedDate(LocalDate.of(2026, 4, 1))
+                    .status(JobStatus.APPLIED)
+                    .company(company)
+                    .build();
+            Job job2 = Job.builder()
+                    .jobTitle("Junior Engineer")
+                    .location("Chicago")
+                    .appliedDate(LocalDate.of(2026, 5, 1))
+                    .status(JobStatus.REJECTED)
+                    .company(company)
+                    .build();
+            Job job3 = Job.builder()
+                    .jobTitle("Owner")
+                    .location("Brampton")
+                    .appliedDate(LocalDate.of(2026, 6, 1))
+                    .status(JobStatus.APPLIED)
+                    .company(company)
+                    .build();
+
+            jobRepository.save(job1);
+            jobRepository.save(job2);
+            jobRepository.save(job3);
+
+            entityManager.flush();
+            entityManager.clear();
+
+            Optional<LocalDate> result = jobRepository.findMostRecentApplication();
+
+            assertThat(result).contains(LocalDate.of(2026, 6, 1));
+        }
+
+        @Test
+        @DisplayName("Should return empty when no jobs exist")
+        void shouldReturnEmptyWhenNoJobsExist() {
+            Optional<LocalDate> result = jobRepository.findMostRecentApplication();
+
+            assertThat(result).isEmpty();
         }
     }
 }
