@@ -28,7 +28,7 @@ const App = () => {
       onSuccess: () => {
         setEdit(null);
         setIsDialogOpen(false);
-      }
+      },
     });
   };
 

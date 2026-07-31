@@ -1,9 +1,5 @@
 import { useState } from 'react';
-import {
-  type JobRequest,
-  type JobResponse,
-  JobStatus,
-} from '@/types';
+import { type JobRequest, type JobResponse, JobStatus } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -39,15 +35,17 @@ const resetJob = (): JobRequest => ({
 });
 
 export const JobForm = ({ onSave, edit }: JobFormProps) => {
-  const [jobData, setJobData] = useState<JobRequest>(edit ?
-    {
-      jobTitle: edit.jobTitle,
-      companyName: edit.company.name,
-      companyJobPageLink: edit.company.jobPageLink || '',
-      location: edit.location,
-      appliedDate: edit.appliedDate,
-      status: edit.status,
-    } : resetJob()
+  const [jobData, setJobData] = useState<JobRequest>(
+    edit
+      ? {
+          jobTitle: edit.jobTitle,
+          companyName: edit.company.name,
+          companyJobPageLink: edit.company.jobPageLink || '',
+          location: edit.location,
+          appliedDate: edit.appliedDate,
+          status: edit.status,
+        }
+      : resetJob()
   );
   const [open, setOpen] = useState(false);
 

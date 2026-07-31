@@ -1,7 +1,7 @@
 import type { JobResponse } from '../types';
 import { JobTable } from '@/components/jobs/JobTable';
 import { useAnalyticsSummary } from '@/hooks/useAnalytics';
-import { TrendingUp, TrendingDown } from "lucide-react";
+import { TrendingUp, TrendingDown } from 'lucide-react';
 
 interface DashboardProps {
   jobs: JobResponse[];
@@ -19,44 +19,55 @@ const Dashboard = ({ jobs, onEdit, onDelete }: DashboardProps) => {
       ? appliedThisWeek > 0
         ? 100
         : 0
-      : ((appliedThisWeek - averageApplicationsPerWeek) / averageApplicationsPerWeek) * 100;
+      : ((appliedThisWeek - averageApplicationsPerWeek) /
+          averageApplicationsPerWeek) *
+        100;
 
   return (
     <div className="flex flex-col gap-4 md:gap-8">
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-xl border bg-card p-6 shadow-sm">
-          <p className="text-sm font-medium text-muted-foreground">Total Applications</p>
+          <p className="text-sm font-medium text-muted-foreground">
+            Total Applications
+          </p>
           <h3 className="text-2xl font-bold mt-1">
-            {isSummaryLoading ? "..." : summary?.totalApplications ?? 0}
+            {isSummaryLoading ? '...' : (summary?.totalApplications ?? 0)}
           </h3>
         </div>
         <div className="rounded-xl border bg-card p-6 shadow-sm">
-          <p className="text-sm font-medium text-muted-foreground">Applied This Week</p>
+          <p className="text-sm font-medium text-muted-foreground">
+            Applied This Week
+          </p>
           <h3 className="text-2xl font-bold text-slate-600 mt-1">
-            {isSummaryLoading ? "..." : summary?.appliedThisWeek ?? 0}
+            {isSummaryLoading ? '...' : (summary?.appliedThisWeek ?? 0)}
           </h3>
           {!isSummaryLoading && summary?.daysSinceLastApplication != null && (
-            <p className={`mt-2 flex items-center gap-1 text-sm ${weeklyAverageChange >= 0 ? "text-green-600" : "text-red-600"}`}>
+            <p
+              className={`mt-2 flex items-center gap-1 text-sm ${weeklyAverageChange >= 0 ? 'text-green-600' : 'text-red-600'}`}
+            >
               {weeklyAverageChange >= 0 ? (
                 <TrendingUp className="h-4 w-4" />
               ) : (
                 <TrendingDown className="h-4 w-4" />
               )}
-
               {Math.abs(weeklyAverageChange).toFixed(1)}% vs 8-week average
             </p>
           )}
         </div>
         <div className="rounded-xl border bg-card p-6 shadow-sm">
-          <p className="text-sm font-medium text-muted-foreground">Days Since Last Application</p>
+          <p className="text-sm font-medium text-muted-foreground">
+            Days Since Last Application
+          </p>
           <h3 className="text-2xl font-bold text-yellow-400 mt-1">
-            {isSummaryLoading ? "..." : summary?.daysSinceLastApplication ?? "-"}
+            {isSummaryLoading
+              ? '...'
+              : (summary?.daysSinceLastApplication ?? '-')}
           </h3>
         </div>
         <div className="rounded-xl border bg-card p-6 shadow-sm">
           <p className="text-sm font-medium text-muted-foreground">Accepted</p>
           <h3 className="text-2xl font-bold text-emerald-600 mt-1">
-            {isSummaryLoading ? "..." : summary?.countByStatus.ACCEPTED ?? 0}
+            {isSummaryLoading ? '...' : (summary?.countByStatus.ACCEPTED ?? 0)}
           </h3>
         </div>
       </div>
