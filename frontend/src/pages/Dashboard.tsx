@@ -35,7 +35,7 @@ const Dashboard = ({ jobs, onEdit, onDelete }: DashboardProps) => {
           <h3 className="text-2xl font-bold text-slate-600 mt-1">
             {isSummaryLoading ? "..." : summary?.appliedThisWeek ?? 0}
           </h3>
-          {!isSummaryLoading && (
+          {!isSummaryLoading && summary?.daysSinceLastApplication != null && (
             <p className={`mt-2 flex items-center gap-1 text-sm ${weeklyAverageChange >= 0 ? "text-green-600" : "text-red-600"}`}>
               {weeklyAverageChange >= 0 ? (
                 <TrendingUp className="h-4 w-4" />
@@ -50,7 +50,7 @@ const Dashboard = ({ jobs, onEdit, onDelete }: DashboardProps) => {
         <div className="rounded-xl border bg-card p-6 shadow-sm">
           <p className="text-sm font-medium text-muted-foreground">Days Since Last Application</p>
           <h3 className="text-2xl font-bold text-yellow-400 mt-1">
-            {isSummaryLoading ? "..." : summary?.daysSinceLastApplication ?? 0}
+            {isSummaryLoading ? "..." : summary?.daysSinceLastApplication ?? "-"}
           </h3>
         </div>
         <div className="rounded-xl border bg-card p-6 shadow-sm">
