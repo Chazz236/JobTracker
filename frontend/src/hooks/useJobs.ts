@@ -27,7 +27,7 @@ export const useJobs = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['jobs'] });
             queryClient.invalidateQueries({ queryKey: ['companies'] });
-            queryClient.invalidateQueries({ queryKey: ['analytics', 'dashboard'] });
+            queryClient.invalidateQueries({ queryKey: ['analytics', 'summary'] });
         },
         onError: (e) => {
             console.error("Can't save job:", e);
@@ -38,7 +38,7 @@ export const useJobs = () => {
         mutationFn: (id: number) => deleteJob(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['jobs'] });
-            queryClient.invalidateQueries({ queryKey: ['analytics', 'dashboard'] });
+            queryClient.invalidateQueries({ queryKey: ['analytics', 'summary'] });
         },
         onError: (e) => {
             console.error("Can't delete job:", e);

@@ -1,6 +1,6 @@
 package com.jobtracker.backend.service;
 
-import com.jobtracker.backend.dto.DashboardAnalyticsResponseDTO;
+import com.jobtracker.backend.dto.AnalyticsSummaryResponseDTO;
 import com.jobtracker.backend.model.JobStatus;
 import com.jobtracker.backend.repository.JobRepository;
 import com.jobtracker.backend.repository.JobStatusCount;
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 public class AnalyticsService {
     private final JobRepository jobRepository;
 
-    public DashboardAnalyticsResponseDTO getDashboardAnalytics() {
+    public AnalyticsSummaryResponseDTO getAnalyticsSummary() {
         List<JobStatusCount> counts = jobRepository.countJobsByStatus();
 
         Map<JobStatus, Long> countByStatus = counts.stream()
@@ -52,7 +52,7 @@ public class AnalyticsService {
                 .map(date -> ChronoUnit.DAYS.between(date, today))
                 .orElse(null);
 
-        return new DashboardAnalyticsResponseDTO(
+        return new AnalyticsSummaryResponseDTO(
                 totalApplications,
                 countByStatus,
                 appliedThisWeek,

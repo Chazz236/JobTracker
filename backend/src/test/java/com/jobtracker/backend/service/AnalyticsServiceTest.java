@@ -1,6 +1,6 @@
 package com.jobtracker.backend.service;
 
-import com.jobtracker.backend.dto.DashboardAnalyticsResponseDTO;
+import com.jobtracker.backend.dto.AnalyticsSummaryResponseDTO;
 import com.jobtracker.backend.model.JobStatus;
 import com.jobtracker.backend.repository.JobRepository;
 import com.jobtracker.backend.repository.JobStatusCount;
@@ -31,10 +31,10 @@ public class AnalyticsServiceTest {
     private AnalyticsService analyticsService;
 
     @Nested
-    @DisplayName("Get Dashboard Analytics")
-    class GetDashboardAnalyticsTests {
+    @DisplayName("Get Analytics Summary")
+    class GetAnalyticsSummaryTests {
         @Test
-        @DisplayName("Should return dashboard analytics")
+        @DisplayName("Should return analytics summary")
         void shouldReturnDashboardAnalytics() {
             JobStatusCount appliedCount = Mockito.mock(JobStatusCount.class);
             JobStatusCount interviewingCount = Mockito.mock(JobStatusCount.class);
@@ -57,7 +57,7 @@ public class AnalyticsServiceTest {
             when(jobRepository.countApplicationsBetweenDates(eightWeeksAgo, startWeek)).thenReturn(24L);
             when(jobRepository.findMostRecentApplication()).thenReturn(Optional.of(today.minusDays(5)));
 
-            DashboardAnalyticsResponseDTO response = analyticsService.getDashboardAnalytics();
+            AnalyticsSummaryResponseDTO response = analyticsService.getAnalyticsSummary();
 
             assertThat(response).isNotNull();
             assertThat(response.totalApplications()).isEqualTo(18L);
@@ -76,8 +76,8 @@ public class AnalyticsServiceTest {
         }
 
         @Test
-        @DisplayName("Should return empty dashboard analytics")
-        void shouldReturnEmptyDashboardAnalytics() {
+        @DisplayName("Should return empty analytics summary")
+        void shouldReturnEmptyAnalyticsSummary() {
             LocalDate today = LocalDate.now();
             LocalDate startWeek = today.with(DayOfWeek.MONDAY);
             LocalDate eightWeeksAgo = startWeek.minusWeeks(8);
@@ -87,7 +87,7 @@ public class AnalyticsServiceTest {
             when(jobRepository.countApplicationsBetweenDates(eightWeeksAgo, startWeek)).thenReturn(0L);
             when(jobRepository.findMostRecentApplication()).thenReturn(Optional.empty());
 
-            DashboardAnalyticsResponseDTO response = analyticsService.getDashboardAnalytics();
+            AnalyticsSummaryResponseDTO response = analyticsService.getAnalyticsSummary();
 
             assertThat(response.totalApplications()).isEqualTo(0L);
             assertThat(response.countByStatus()).isEmpty();

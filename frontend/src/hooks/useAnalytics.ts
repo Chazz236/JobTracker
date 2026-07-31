@@ -1,15 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
-import { getDashboardAnalytics } from '@/services/analyticsService';
-import type { DashboardAnalyticsResponse } from '@/types';
+import { getAnalyticsSummary } from '@/services/analyticsService';
+import type { AnalyticsSummaryResponse } from '@/types';
 
-export const useDashboardAnalytics = () => {
-    const { data: analytics, isPending, error } = useQuery<DashboardAnalyticsResponse>({
-        queryKey: ['analytics', 'dashboard'],
-        queryFn: getDashboardAnalytics,
+export const useAnalyticsSummary = () => {
+    const { data: summary, isPending, error } = useQuery<AnalyticsSummaryResponse>({
+        queryKey: ['analytics', 'summary'],
+        queryFn: getAnalyticsSummary,
     });
 
     return {
-        analytics,
+        summary,
         isPending,
         error,
     };

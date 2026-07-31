@@ -1,10 +1,10 @@
 import api from './api';
-import type { DashboardAnalyticsResponse } from '@/types';
+import type { AnalyticsSummaryResponse } from '@/types';
 
-export const getDashboardAnalytics =
-  async (): Promise<DashboardAnalyticsResponse> => {
-    const response = await api.get<DashboardAnalyticsResponse>(
-      '/analytics/dashboard'
+export const getAnalyticsSummary =
+  async (): Promise<AnalyticsSummaryResponse> => {
+    const response = await api.get<AnalyticsSummaryResponse>(
+      '/analytics/summary'
     );
     return response.data;
   };

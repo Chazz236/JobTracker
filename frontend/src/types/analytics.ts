@@ -1,6 +1,6 @@
 import type { JobStatus } from './jobs';
 
-export interface DashboardAnalyticsResponse {
+export interface AnalyticsSummaryResponse {
   totalApplications: number;
   countByStatus: Record<JobStatus, number>;
   appliedThisWeek: number;

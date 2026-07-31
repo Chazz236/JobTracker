@@ -1,6 +1,6 @@
 import type { JobResponse } from '../types';
 import { JobTable } from '@/components/jobs/JobTable';
-import { useDashboardAnalytics } from '@/hooks/useAnalytics';
+import { useAnalyticsSummary } from '@/hooks/useAnalytics';
 import { TrendingUp, TrendingDown } from "lucide-react";
 
 interface DashboardProps {
@@ -10,10 +10,10 @@ interface DashboardProps {
 }
 
 const Dashboard = ({ jobs, onEdit, onDelete }: DashboardProps) => {
-  const { analytics, isPending: analyticsLoading } = useDashboardAnalytics();
+  const { summary, isPending: isSummaryLoading } = useAnalyticsSummary();
 
-  const appliedThisWeek = analytics?.appliedThisWeek ?? 0;
-  const averageApplicationsPerWeek = analytics?.averageApplicationsPerWeek ?? 0;
+  const appliedThisWeek = summary?.appliedThisWeek ?? 0;
+  const averageApplicationsPerWeek = summary?.averageApplicationsPerWeek ?? 0;
   const weeklyAverageChange =
     averageApplicationsPerWeek === 0
       ? appliedThisWeek > 0
@@ -27,15 +27,15 @@ const Dashboard = ({ jobs, onEdit, onDelete }: DashboardProps) => {
         <div className="rounded-xl border bg-card p-6 shadow-sm">
           <p className="text-sm font-medium text-muted-foreground">Total Applications</p>
           <h3 className="text-2xl font-bold mt-1">
-            {analyticsLoading ? "..." : analytics?.totalApplications ?? 0}
+            {isSummaryLoading ? "..." : summary?.totalApplications ?? 0}
           </h3>
         </div>
         <div className="rounded-xl border bg-card p-6 shadow-sm">
           <p className="text-sm font-medium text-muted-foreground">Applied This Week</p>
           <h3 className="text-2xl font-bold text-slate-600 mt-1">
-            {analyticsLoading ? "..." : analytics?.appliedThisWeek ?? 0}
+            {isSummaryLoading ? "..." : summary?.appliedThisWeek ?? 0}
           </h3>
-          {!analyticsLoading && (
+          {!isSummaryLoading && (
             <p className={`mt-2 flex items-center gap-1 text-sm ${weeklyAverageChange >= 0 ? "text-green-600" : "text-red-600"}`}>
               {weeklyAverageChange >= 0 ? (
                 <TrendingUp className="h-4 w-4" />
@@ -50,13 +50,13 @@ const Dashboard = ({ jobs, onEdit, onDelete }: DashboardProps) => {
         <div className="rounded-xl border bg-card p-6 shadow-sm">
           <p className="text-sm font-medium text-muted-foreground">Days Since Last Application</p>
           <h3 className="text-2xl font-bold text-yellow-400 mt-1">
-            {analyticsLoading ? "..." : analytics?.daysSinceLastApplication ?? 0}
+            {isSummaryLoading ? "..." : summary?.daysSinceLastApplication ?? 0}
           </h3>
         </div>
         <div className="rounded-xl border bg-card p-6 shadow-sm">
           <p className="text-sm font-medium text-muted-foreground">Accepted</p>
           <h3 className="text-2xl font-bold text-emerald-600 mt-1">
-            {analyticsLoading ? "..." : analytics?.countByStatus.ACCEPTED ?? 0}
+            {isSummaryLoading ? "..." : summary?.countByStatus.ACCEPTED ?? 0}
           </h3>
         </div>
       </div>

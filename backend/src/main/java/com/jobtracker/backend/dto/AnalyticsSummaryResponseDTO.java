@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.Map;
 
-public record DashboardAnalyticsResponseDTO(
+public record AnalyticsSummaryResponseDTO(
         @Schema(description = "Total number of job applications submitted", example = "1")
         Long totalApplications,
 

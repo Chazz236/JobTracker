@@ -1,6 +1,6 @@
 package com.jobtracker.backend.controller;
 
-import com.jobtracker.backend.dto.DashboardAnalyticsResponseDTO;
+import com.jobtracker.backend.dto.AnalyticsSummaryResponseDTO;
 import com.jobtracker.backend.service.AnalyticsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -24,10 +24,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class AnalyticsController {
     private final AnalyticsService analyticsService;
 
-    @Operation(summary = "Get analytics for dashboard", description = "Returns key analytics for dashboard cards")
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved dashboard analytics")
-    @GetMapping("/dashboard")
-    public ResponseEntity<DashboardAnalyticsResponseDTO> getDashboardAnalytics() {
-        return ResponseEntity.ok(analyticsService.getDashboardAnalytics());
+    @Operation(summary = "Get analytics summary", description = "Returns key analytics summary")
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved analytics summary")
+    @GetMapping("/summary")
+    public ResponseEntity<AnalyticsSummaryResponseDTO> getAnalyticsSummary() {
+        return ResponseEntity.ok(analyticsService.getAnalyticsSummary());
     }
 }

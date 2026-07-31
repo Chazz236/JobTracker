@@ -1,6 +1,6 @@
 package com.jobtracker.backend.controller;
 
-import com.jobtracker.backend.dto.DashboardAnalyticsResponseDTO;
+import com.jobtracker.backend.dto.AnalyticsSummaryResponseDTO;
 import com.jobtracker.backend.model.JobStatus;
 import com.jobtracker.backend.service.AnalyticsService;
 import org.junit.jupiter.api.DisplayName;
@@ -30,17 +30,17 @@ public class AnalyticsControllerTest {
     private AnalyticsService analyticsService;
 
     @Nested
-    @DisplayName("Get Dashboard Analytics API")
-    class GetDashboardAnalyticsTests {
+    @DisplayName("Get Analytics Summary API")
+    class GetAnalyticsSummaryTests {
         @Test
-        @DisplayName("GET /api/analytics/dashboard - Should return analytics for dashboard")
-        void shouldReturnDashboardAnalytics() throws Exception {
+        @DisplayName("GET /api/analytics/summary - Should return analytics summary")
+        void shouldReturnAnalyticsSummary() throws Exception {
             Map<JobStatus, Long> statusCounts = Map.of(
                     JobStatus.APPLIED, 5L,
                     JobStatus.INTERVIEWING, 2L,
                     JobStatus.REJECTED, 3L
             );
-            DashboardAnalyticsResponseDTO analytics = new DashboardAnalyticsResponseDTO(
+            AnalyticsSummaryResponseDTO analytics = new AnalyticsSummaryResponseDTO(
                     10L,
                     statusCounts,
                     3L,
@@ -48,9 +48,9 @@ public class AnalyticsControllerTest {
                     5L
             );
 
-            when(analyticsService.getDashboardAnalytics()).thenReturn(analytics);
+            when(analyticsService.getAnalyticsSummary()).thenReturn(analytics);
 
-            mockMvc.perform(get("/api/analytics/dashboard")
+            mockMvc.perform(get("/api/analytics/summary")
                             .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.totalApplications").value(10))
@@ -59,13 +59,13 @@ public class AnalyticsControllerTest {
                     .andExpect(jsonPath("$.appliedThisWeek").value(3))
                     .andExpect(jsonPath("$.averageApplicationsPerWeek").value(2.5))
                     .andExpect(jsonPath("$.daysSinceLastApplication").value(5));
-            verify(analyticsService).getDashboardAnalytics();
+            verify(analyticsService).getAnalyticsSummary();
         }
 
         @Test
-        @DisplayName("GET /api/analytics/dashboard - Should return zero values when no applications exist")
+        @DisplayName("GET /api/analytics/summary - Should return zero values when no applications exist")
         void shouldReturnEmptyDashboardAnalytics() throws Exception {
-            DashboardAnalyticsResponseDTO analytics = new DashboardAnalyticsResponseDTO(
+            AnalyticsSummaryResponseDTO analytics = new AnalyticsSummaryResponseDTO(
                     0L,
                     Map.of(),
                     0L,
@@ -73,16 +73,16 @@ public class AnalyticsControllerTest {
                     null
             );
 
-            when(analyticsService.getDashboardAnalytics()).thenReturn(analytics);
+            when(analyticsService.getAnalyticsSummary()).thenReturn(analytics);
 
-            mockMvc.perform(get("/api/analytics/dashboard"))
+            mockMvc.perform(get("/api/analytics/summary"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.totalApplications").value(0))
                     .andExpect(jsonPath("$.countByStatus").isEmpty())
                     .andExpect(jsonPath("$.appliedThisWeek").value(0))
                     .andExpect(jsonPath("$.averageApplicationsPerWeek").value(0.0))
                     .andExpect(jsonPath("$.daysSinceLastApplication").value(nullValue()));
-            verify(analyticsService).getDashboardAnalytics();
+            verify(analyticsService).getAnalyticsSummary();
         }
     }
 }
