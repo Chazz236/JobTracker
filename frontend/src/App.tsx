@@ -1,39 +1,22 @@
 import Dashboard from './pages/Dashboard';
-import { useState } from 'react';
 import { JobDialog } from './components/jobs/JobDialog';
-import type { JobRequest, JobResponse } from '@/types';
 import { useJobs } from './hooks/useJobs';
+import { useJobDialog } from './hooks/useJobDialog'; // Import your new hook
 import { Layout } from './components/layout/Layout';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Analytics from './pages/Analytics';
+import type { JobRequest } from '@/types';
 
 const App = () => {
-  const [edit, setEdit] = useState<JobResponse | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-
   const { jobs, isPending, error, saveJob, deleteJob } = useJobs();
-
-  const onAdd = () => {
-    setEdit(null);
-    setIsDialogOpen(true);
-  };
-
-  const onEdit = (job: JobResponse) => {
-    setEdit(job);
-    setIsDialogOpen(true);
-  };
+  const { edit, isOpen, setIsOpen, openAdd, openEdit, close } = useJobDialog();
 
   const onSave = (job: JobRequest) => {
     saveJob(job, edit?.id, {
       onSuccess: () => {
-        setEdit(null);
-        setIsDialogOpen(false);
+        close();
       },
     });
-  };
-
-  const onDelete = (id: number) => {
-    deleteJob(id);
   };
 
   if (isPending) {
@@ -55,11 +38,11 @@ const App = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route element={<Layout onAdd={onAdd} />}>
+        <Route element={<Layout onAdd={openAdd} />}>
           <Route
             path="/dashboard"
             element={
-              <Dashboard jobs={jobs} onEdit={onEdit} onDelete={onDelete} />
+              <Dashboard jobs={jobs} onEdit={openEdit} onDelete={deleteJob} />
             }
           />
           <Route path="/analytics" element={<Analytics />} />
@@ -69,8 +52,8 @@ const App = () => {
       <JobDialog
         onSave={onSave}
         edit={edit}
-        open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
+        open={isOpen}
+        onOpenChange={setIsOpen}
       />
     </BrowserRouter>
   );
