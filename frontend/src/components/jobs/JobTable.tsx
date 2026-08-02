@@ -6,8 +6,20 @@ interface JobTableProps {
   jobs: JobResponse[];
   onDelete: (id: number) => void;
   onEdit: (job: JobResponse) => void;
+  showTableControls: boolean;
 }
 
-export const JobTable = ({ jobs, onDelete, onEdit }: JobTableProps) => {
-  return <DataTable columns={columns({ onEdit, onDelete })} data={jobs} />;
+export const JobTable = ({
+  jobs,
+  onDelete,
+  onEdit,
+  showTableControls,
+}: JobTableProps) => {
+  return (
+    <DataTable
+      columns={columns({ onEdit, onDelete, enableSorting: showTableControls })}
+      data={jobs}
+      showTableControls={showTableControls}
+    />
+  );
 };

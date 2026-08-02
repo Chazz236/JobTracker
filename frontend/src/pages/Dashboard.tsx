@@ -72,7 +72,12 @@ const Dashboard = ({ jobs, onEdit, onDelete }: DashboardProps) => {
         </div>
       </div>
       <div className="rounded-xl border bg-card text-card-foreground shadow-sm p-6">
-        <JobTable jobs={jobs} onDelete={onDelete} onEdit={onEdit} />
+        <JobTable
+          jobs={jobs}
+          onDelete={onDelete}
+          onEdit={onEdit}
+          showTableControls={false}
+        />
       </div>
     </div>
   );

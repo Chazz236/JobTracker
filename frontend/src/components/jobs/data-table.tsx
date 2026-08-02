@@ -29,11 +29,13 @@ import {
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  showTableControls: boolean;
 }
 
 export const DataTable = <TData, TValue>({
   columns,
   data,
+  showTableControls,
 }: DataTableProps<TData, TValue>) => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState('');
@@ -67,37 +69,39 @@ export const DataTable = <TData, TValue>({
           </p>
         </div>
       </div>
-      <div className="flex items-center justify-between py-4 gap-2">
-        <div className="relative w-full max-w-sm">
-          <Input
-            placeholder="Search jobs, companies, or locations..."
-            value={globalFilter ?? ''}
-            onChange={(e) => setGlobalFilter(e.target.value)}
-          />
+      {showTableControls && (
+        <div className="flex items-center justify-between py-4 gap-2">
+          <div className="relative w-full max-w-sm">
+            <Input
+              placeholder="Search jobs, companies, or locations..."
+              value={globalFilter ?? ''}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+            />
+          </div>
+          <Select
+            value={
+              (table.getColumn('status')?.getFilterValue() as string) ?? 'all'
+            }
+            onValueChange={(value) =>
+              table
+                .getColumn('status')
+                ?.setFilterValue(value === 'all' ? '' : value)
+            }
+          >
+            <SelectTrigger className="w-[180px] bg-background">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Statuses</SelectItem>
+              <SelectItem value="APPLIED">Applied</SelectItem>
+              <SelectItem value="INTERVIEWING">Interviewing</SelectItem>
+              <SelectItem value="OFFERED">Offered</SelectItem>
+              <SelectItem value="ACCEPTED">Accepted</SelectItem>
+              <SelectItem value="REJECTED">Rejected</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-        <Select
-          value={
-            (table.getColumn('status')?.getFilterValue() as string) ?? 'all'
-          }
-          onValueChange={(value) =>
-            table
-              .getColumn('status')
-              ?.setFilterValue(value === 'all' ? '' : value)
-          }
-        >
-          <SelectTrigger className="w-[180px] bg-background">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Statuses</SelectItem>
-            <SelectItem value="APPLIED">Applied</SelectItem>
-            <SelectItem value="INTERVIEWING">Interviewing</SelectItem>
-            <SelectItem value="OFFERED">Offered</SelectItem>
-            <SelectItem value="ACCEPTED">Accepted</SelectItem>
-            <SelectItem value="REJECTED">Rejected</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      )}
       <div className="rounded-md border">
         <Table>
           <TableHeader>

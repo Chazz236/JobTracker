@@ -12,16 +12,22 @@ import {
 interface ColumnProps {
   onEdit: (job: JobResponse) => void;
   onDelete: (id: number) => void;
+  enableSorting: boolean;
 }
 
 export const columns = ({
   onEdit,
   onDelete,
+  enableSorting,
 }: ColumnProps): ColumnDef<JobResponse>[] => [
   {
     accessorKey: 'jobTitle',
     header: ({ column }) => (
-      <SortableHeader column={column} title="Job Title" />
+      <SortableHeader
+        column={column}
+        title="Job Title"
+        enableSorting={enableSorting}
+      />
     ),
     cell: ({ row }) => {
       const title = row.getValue('jobTitle') as string;
@@ -43,7 +49,13 @@ export const columns = ({
   {
     id: 'companyName',
     accessorFn: (row) => `${row.company.name}`,
-    header: ({ column }) => <SortableHeader column={column} title="Company" />,
+    header: ({ column }) => (
+      <SortableHeader
+        column={column}
+        title="Company"
+        enableSorting={enableSorting}
+      />
+    ),
     cell: ({ row }) => {
       const name = row.original.company.name;
       const link = row.original.company.jobPageLink;
@@ -79,7 +91,13 @@ export const columns = ({
   },
   {
     accessorKey: 'location',
-    header: ({ column }) => <SortableHeader column={column} title="Location" />,
+    header: ({ column }) => (
+      <SortableHeader
+        column={column}
+        title="Location"
+        enableSorting={enableSorting}
+      />
+    ),
     cell: ({ row }) => {
       const location = row.original.location;
       return (
@@ -102,14 +120,22 @@ export const columns = ({
   {
     accessorKey: 'appliedDate',
     header: ({ column }) => (
-      <SortableHeader column={column} title="Applied Date" />
+      <SortableHeader
+        column={column}
+        title="Applied Date"
+        enableSorting={enableSorting}
+      />
     ),
     sortingFn: 'alphanumeric',
   },
   {
     accessorKey: 'status',
     header: ({ column }) => (
-      <SortableHeader column={column} title="Application Status" />
+      <SortableHeader
+        column={column}
+        title="Application Status"
+        enableSorting={enableSorting}
+      />
     ),
     cell: ({ row }) => {
       const status = row.getValue('status') as string;

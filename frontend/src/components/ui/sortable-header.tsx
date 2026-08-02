@@ -5,12 +5,18 @@ import { Button } from './button';
 interface SortableHeaderProps<TData, TValue> {
   column: Column<TData, TValue>;
   title: string;
+  enableSorting: boolean;
 }
 
 export const SortableHeader = <TData, TValue>({
   column,
   title,
+  enableSorting,
 }: SortableHeaderProps<TData, TValue>) => {
+  if (!enableSorting) {
+    return <div className="font-medium">{title}</div>;
+  }
+
   const isSorted = column.getIsSorted();
 
   const Icon =
