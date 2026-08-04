@@ -59,18 +59,18 @@ export const DataTable = <TData, TValue>({
 
   return (
     <div>
-      <div>
+      <div className="mb-6">
         <div className="flex flex-col gap-1">
           <h1 className="text-2xl font-bold tracking-tight">
-            Job Applications
+            {showTableControls ? "Job Applications" : "Applications To Watch"}
           </h1>
           <p className="text-sm text-muted-foreground">
-            Manage and track your job search progress
+            {showTableControls ? "Manage and track your job search progress" : "Keep an eye on these applications"}
           </p>
         </div>
       </div>
       {showTableControls && (
-        <div className="flex items-center justify-between py-4 gap-2">
+        <div className="flex items-center justify-between pb-4 gap-2">
           <div className="relative w-full max-w-sm">
             <Input
               placeholder="Search jobs, companies, or locations..."
@@ -113,9 +113,9 @@ export const DataTable = <TData, TValue>({
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                     </TableHead>
                   );
                 })}

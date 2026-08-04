@@ -13,6 +13,7 @@ import {
   CirclePlus,
   Briefcase,
   ChartColumnStacked,
+  ClipboardList
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -30,6 +31,11 @@ const nav = [
     title: 'Analytics',
     url: '/analytics',
     icon: ChartColumnStacked,
+  },
+  {
+    title: 'Applications',
+    url: '/applications',
+    icon: ClipboardList,
   },
 ];
 

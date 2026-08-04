@@ -1,11 +1,12 @@
 import Dashboard from './pages/Dashboard';
 import { JobDialog } from './components/jobs/JobDialog';
 import { useJobs } from './hooks/useJobs';
-import { useJobDialog } from './hooks/useJobDialog'; // Import your new hook
+import { useJobDialog } from './hooks/useJobDialog';
 import { Layout } from './components/layout/Layout';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Analytics from './pages/Analytics';
 import type { JobRequest } from '@/types';
+import Applications from './pages/Applications';
 
 const App = () => {
   const { jobs, isPending, error, saveJob, deleteJob } = useJobs();
@@ -39,13 +40,9 @@ const App = () => {
     <BrowserRouter>
       <Routes>
         <Route element={<Layout onAdd={openAdd} />}>
-          <Route
-            path="/dashboard"
-            element={
-              <Dashboard jobs={jobs} onEdit={openEdit} onDelete={deleteJob} />
-            }
-          />
+          <Route path="/dashboard" element={<Dashboard jobs={jobs} onEdit={openEdit} onDelete={deleteJob} />} />
           <Route path="/analytics" element={<Analytics />} />
+          <Route path="/applications" element={<Applications jobs={jobs} onEdit={openEdit} onDelete={deleteJob} />} />
         </Route>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
       </Routes>
