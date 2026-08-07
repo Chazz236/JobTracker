@@ -1,4 +1,4 @@
-import type { JobResponse } from '../types';
+import type { JobResponse, JobStatus } from '../types';
 import { JobTable } from '@/components/jobs/JobTable';
 import { useAnalyticsSummary } from '@/hooks/useAnalytics';
 import { TrendingUp, TrendingDown } from 'lucide-react';
@@ -8,6 +8,14 @@ interface DashboardProps {
   onEdit: (job: JobResponse) => void;
   onDelete: (id: number) => void;
 }
+
+const statusPriority: Record<JobStatus, number> = {
+  OFFERED: 1,
+  INTERVIEWING: 2,
+  APPLIED: 3,
+  ACCEPTED: 4,
+  REJECTED: 5,
+};
 
 const Dashboard = ({ jobs, onEdit, onDelete }: DashboardProps) => {
   const { summary, isPending: isSummaryLoading } = useAnalyticsSummary();
@@ -20,11 +28,22 @@ const Dashboard = ({ jobs, onEdit, onDelete }: DashboardProps) => {
         ? 100
         : 0
       : ((appliedThisWeek - averageApplicationsPerWeek) /
-          averageApplicationsPerWeek) *
-        100;
+        averageApplicationsPerWeek) *
+      100;
+
+  const jobsToWatch = [...jobs].filter(job => job.status !== 'ACCEPTED' && job.status !== 'REJECTED').sort((a, b) => {
+    const statusDifference = statusPriority[a.status] - statusPriority[b.status];
+
+    if (statusDifference !== 0) {
+      return statusDifference;
+    }
+
+    return new Date(b.appliedDate).getTime() - new Date(a.appliedDate).getTime();
+  }).slice(0, 9);
+
 
   return (
-    <div className="flex flex-col gap-4 md:gap-8">
+    <div className="flex flex-col gap-4 md:gap-6">
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-xl border bg-card p-6 shadow-sm">
           <p className="text-sm font-medium text-muted-foreground">
@@ -73,7 +92,7 @@ const Dashboard = ({ jobs, onEdit, onDelete }: DashboardProps) => {
       </div>
       <div className="rounded-xl border bg-card text-card-foreground shadow-sm p-6">
         <JobTable
-          jobs={jobs}
+          jobs={jobsToWatch}
           onDelete={onDelete}
           onEdit={onEdit}
           showTableControls={false}
