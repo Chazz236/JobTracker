@@ -12,7 +12,7 @@ export const Layout = ({ onAdd }: LayoutProps) => {
   const pageTitles: Record<string, string> = {
     '/dashboard': 'Dashboard',
     '/analytics': 'Analytics',
-    '/applications': 'Applications'
+    '/applications': 'Applications',
   };
 
   const currentPage = pageTitles[location.pathname];

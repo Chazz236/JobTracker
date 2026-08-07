@@ -13,7 +13,7 @@ import {
   CirclePlus,
   Briefcase,
   ChartColumnStacked,
-  ClipboardList
+  ClipboardList,
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 

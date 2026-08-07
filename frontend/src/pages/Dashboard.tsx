@@ -28,19 +28,24 @@ const Dashboard = ({ jobs, onEdit, onDelete }: DashboardProps) => {
         ? 100
         : 0
       : ((appliedThisWeek - averageApplicationsPerWeek) /
-        averageApplicationsPerWeek) *
-      100;
+          averageApplicationsPerWeek) *
+        100;
 
-  const jobsToWatch = [...jobs].filter(job => job.status !== 'ACCEPTED' && job.status !== 'REJECTED').sort((a, b) => {
-    const statusDifference = statusPriority[a.status] - statusPriority[b.status];
+  const jobsToWatch = [...jobs]
+    .filter((job) => job.status !== 'ACCEPTED' && job.status !== 'REJECTED')
+    .sort((a, b) => {
+      const statusDifference =
+        statusPriority[a.status] - statusPriority[b.status];
 
-    if (statusDifference !== 0) {
-      return statusDifference;
-    }
+      if (statusDifference !== 0) {
+        return statusDifference;
+      }
 
-    return new Date(b.appliedDate).getTime() - new Date(a.appliedDate).getTime();
-  }).slice(0, 9);
-
+      return (
+        new Date(b.appliedDate).getTime() - new Date(a.appliedDate).getTime()
+      );
+    })
+    .slice(0, 9);
 
   return (
     <div className="flex flex-col gap-4 md:gap-6">

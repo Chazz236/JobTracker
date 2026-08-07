@@ -62,10 +62,12 @@ export const DataTable = <TData, TValue>({
       <div className="mb-6">
         <div className="flex flex-col gap-1">
           <h1 className="text-2xl font-bold tracking-tight">
-            {showTableControls ? "Job Applications" : "Applications To Watch"}
+            {showTableControls ? 'Job Applications' : 'Applications To Watch'}
           </h1>
           <p className="text-sm text-muted-foreground">
-            {showTableControls ? "Manage and track your job search progress" : "Keep an eye on these applications"}
+            {showTableControls
+              ? 'Manage and track your job search progress'
+              : 'Keep an eye on these applications'}
           </p>
         </div>
       </div>
@@ -113,9 +115,9 @@ export const DataTable = <TData, TValue>({
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
                     </TableHead>
                   );
                 })}

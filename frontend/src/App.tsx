@@ -40,9 +40,23 @@ const App = () => {
     <BrowserRouter>
       <Routes>
         <Route element={<Layout onAdd={openAdd} />}>
-          <Route path="/dashboard" element={<Dashboard jobs={jobs} onEdit={openEdit} onDelete={deleteJob} />} />
+          <Route
+            path="/dashboard"
+            element={
+              <Dashboard jobs={jobs} onEdit={openEdit} onDelete={deleteJob} />
+            }
+          />
           <Route path="/analytics" element={<Analytics />} />
-          <Route path="/applications" element={<Applications jobs={jobs} onEdit={openEdit} onDelete={deleteJob} />} />
+          <Route
+            path="/applications"
+            element={
+              <Applications
+                jobs={jobs}
+                onEdit={openEdit}
+                onDelete={deleteJob}
+              />
+            }
+          />
         </Route>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
       </Routes>
